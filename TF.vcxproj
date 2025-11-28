@@ -81,6 +81,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>main</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -108,9 +110,66 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies />
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>main</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Controladores\Controller.h" />
+    <ClInclude Include="Forms\MenuPrincipal.h" />
+    <ClInclude Include="Forms\Nivel1.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Forms\SelectCharacterForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="GameConfig.h" />
+    <ClInclude Include="GameStateManager.h" />
+    <ClInclude Include="Personajes\Character.h" />
+    <ClInclude Include="Personajes\Enemy1.h" />
+    <ClInclude Include="Personajes\Enemy2.h" />
+    <ClInclude Include="Personajes\Enemy3.h" />
+    <ClInclude Include="Personajes\Hero1.h" />
+    <ClInclude Include="Personajes\Hero2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Background\fondo1.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\Sprites\IA.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\Sprites\Prota.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\Sprites\roboto.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Forms\MenuPrincipal.cpp" />
+    <ClCompile Include="Forms\Nivel1.cpp" />
+    <ClCompile Include="Forms\SelectCharacterForm.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\Nivel1.resx">
+      <DependentUpon>Forms\Nivel1.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SelectCharacterForm.resx">
+      <DependentUpon>Forms\SelectCharacterForm.h</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

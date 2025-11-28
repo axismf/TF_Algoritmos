@@ -1,17 +1,93 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{ab985e99-e322-4de8-ae0e-3cf238eb0a60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Assets\Sprites">
+      <UniqueIdentifier>{3e04fecd-b5ab-4929-b8b3-0ca103759c12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Assets\Backgrounds">
+      <UniqueIdentifier>{2bd480cc-77e9-49c8-b94e-25c14cb81aae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Sounds">
+      <UniqueIdentifier>{3f8e459c-a3a9-452d-b38a-ec8842207c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\UI">
+      <UniqueIdentifier>{f65a1f7f-a4c2-4138-8fb5-de18b59b7f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controladores">
+      <UniqueIdentifier>{f66d25d5-793d-4ea6-b700-bfdd3acae6d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Forms">
+      <UniqueIdentifier>{3d2bb7da-8904-48ba-a871-04b297701edd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Personajes">
+      <UniqueIdentifier>{7139dce5-efc8-4e86-b481-e582b8c47bcf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Personajes\Character.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\Enemy1.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\Enemy2.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\Enemy3.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\Hero1.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\Hero2.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Controladores\Controller.h">
+      <Filter>Controladores</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig.h">
+      <Filter>Controladores</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateManager.h">
+      <Filter>Controladores</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\MenuPrincipal.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\SelectCharacterForm.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\Nivel1.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Sprites\IA.png">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\Prota.png">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\roboto.png">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Background\fondo1.png">
+      <Filter>Assets\Backgrounds</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Forms\MenuPrincipal.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\SelectCharacterForm.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\Nivel1.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
