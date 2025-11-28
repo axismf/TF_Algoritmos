@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Controladores\Controller.h" />
+    <ClInclude Include="Controladores\GameConfig.h" />
     <ClInclude Include="Forms\MenuPrincipal.h" />
     <ClInclude Include="Forms\Nivel1.h">
       <FileType>CppForm</FileType>
@@ -123,7 +124,6 @@
     <ClInclude Include="Forms\SelectCharacterForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Personajes\Character.h" />
     <ClInclude Include="Personajes\Enemy1.h" />

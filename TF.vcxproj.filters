@@ -48,9 +48,6 @@
     <ClInclude Include="Controladores\Controller.h">
       <Filter>Controladores</Filter>
     </ClInclude>
-    <ClInclude Include="GameConfig.h">
-      <Filter>Controladores</Filter>
-    </ClInclude>
     <ClInclude Include="GameStateManager.h">
       <Filter>Controladores</Filter>
     </ClInclude>
@@ -62,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="Forms\Nivel1.h">
       <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="Controladores\GameConfig.h">
+      <Filter>Controladores</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
