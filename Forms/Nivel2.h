@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "../Controladores/Controller.h"
 #include "../Controladores/GameStateManager.h"
-#include "Nivel2.h"
+#include "Nivel3.h"
 
 namespace JuegoFinal {
 
@@ -9,7 +9,7 @@ namespace JuegoFinal {
     using namespace System::Windows::Forms;
     using namespace System::Drawing;
 
-    public ref class Nivel1 : public Form
+    public ref class Nivel2 : public Form
     {
     private:
         Graphics^ g;
@@ -25,7 +25,6 @@ namespace JuegoFinal {
 
         Controller* controller;
 
-        // UI Labels
         Label^ lbVidas;
         Label^ lbTiempo;
         Label^ lbPuntos;
@@ -37,18 +36,18 @@ namespace JuegoFinal {
 
         int timeRemaining;
         int frameCount;
-        int requiredTime; // Tiempo requerido para spawn del portal
+        int requiredTime;
         bool portalSpawned;
         GameStateManager^ gameState;
 
     public:
-        Nivel1(void)
+        Nivel2(void)
         {
             InitializeComponent();
             InitializeGame();
         }
 
-        ~Nivel1()
+        ~Nivel2()
         {
             if (controller != nullptr) {
                 delete controller;
@@ -66,33 +65,29 @@ namespace JuegoFinal {
             this->components = gcnew System::ComponentModel::Container();
             this->SuspendLayout();
 
-            // Configuración de la ventana
-            this->Text = L"Nivel 1 - Dimensión del Caos";
+            this->Text = L"Nivel 2 - Dimensión Infernal";
             this->ClientSize = System::Drawing::Size(1200, 700);
             this->StartPosition = FormStartPosition::CenterScreen;
             this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
             this->MaximizeBox = false;
             this->BackColor = Color::Black;
             this->KeyPreview = true;
-            this->KeyDown += gcnew KeyEventHandler(this, &Nivel1::Nivel1_KeyDown);
+            this->KeyDown += gcnew KeyEventHandler(this, &Nivel2::Nivel2_KeyDown);
 
-            // Panel HUD (arriba)
             panelHUD = gcnew Panel();
             panelHUD->Location = Point(0, 0);
             panelHUD->Size = Drawing::Size(1200, 80);
-            panelHUD->BackColor = Color::FromArgb(30, 30, 40);
+            panelHUD->BackColor = Color::FromArgb(40, 20, 20);
             this->Controls->Add(panelHUD);
 
-            // Label Nivel
             lbNivel = gcnew Label();
-            lbNivel->Text = L"NIVEL 1";
+            lbNivel->Text = L"NIVEL 2";
             lbNivel->Font = gcnew Drawing::Font("Arial", 18.0f, FontStyle::Bold);
-            lbNivel->ForeColor = Color::Cyan;
+            lbNivel->ForeColor = Color::Red;
             lbNivel->AutoSize = true;
             lbNivel->Location = Point(20, 25);
             panelHUD->Controls->Add(lbNivel);
 
-            // Label Vidas
             lbVidas = gcnew Label();
             lbVidas->Text = L"❤️ Vidas: 5";
             lbVidas->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
@@ -101,16 +96,14 @@ namespace JuegoFinal {
             lbVidas->Location = Point(250, 28);
             panelHUD->Controls->Add(lbVidas);
 
-            // Label Tiempo
             lbTiempo = gcnew Label();
-            lbTiempo->Text = L"⏱️ Tiempo: 60s";
+            lbTiempo->Text = L"⏱️ Tiempo: 90s";
             lbTiempo->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbTiempo->ForeColor = Color::Yellow;
             lbTiempo->AutoSize = true;
             lbTiempo->Location = Point(480, 28);
             panelHUD->Controls->Add(lbTiempo);
 
-            // Label Puntos
             lbPuntos = gcnew Label();
             lbPuntos->Text = L"⭐ Puntos: 0";
             lbPuntos->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
@@ -119,26 +112,23 @@ namespace JuegoFinal {
             lbPuntos->Location = Point(750, 28);
             panelHUD->Controls->Add(lbPuntos);
 
-            // Label Objetivo
             lbObjetivo = gcnew Label();
-            lbObjetivo->Text = L"🎯 Sobrevive 30 segundos";
+            lbObjetivo->Text = L"🎯 Sobrevive 45 segundos";
             lbObjetivo->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
-            lbObjetivo->ForeColor = Color::LightGreen;
+            lbObjetivo->ForeColor = Color::Orange;
             lbObjetivo->AutoSize = true;
             lbObjetivo->Location = Point(950, 30);
             panelHUD->Controls->Add(lbObjetivo);
 
-            // Panel de juego (debajo del HUD)
             panelJuego = gcnew Panel();
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
             this->Controls->Add(panelJuego);
 
-            // Timer
             timer = gcnew Timer(this->components);
-            timer->Interval = 16; // ~60 FPS
-            timer->Tick += gcnew EventHandler(this, &Nivel1::timer_Tick);
+            timer->Interval = 16;
+            timer->Tick += gcnew EventHandler(this, &Nivel2::timer_Tick);
 
             this->ResumeLayout(false);
         }
@@ -146,8 +136,8 @@ namespace JuegoFinal {
         void InitializeGame()
         {
             gameState = GameStateManager::getInstance();
-            timeRemaining = 60;
-            requiredTime = 30; // Sobrevivir 30 segundos para que aparezca el portal
+            timeRemaining = 90;  // Más tiempo en nivel 2
+            requiredTime = 45;   // Sobrevivir 45 segundos
             frameCount = 0;
             portalSpawned = false;
 
@@ -155,7 +145,6 @@ namespace JuegoFinal {
             space = BufferedGraphicsManager::Current;
             buffer = space->Allocate(g, panelJuego->ClientRectangle);
 
-            // Cargar sprites
             bmpHero1 = gcnew Bitmap("Assets/Sprites/prota.png");
             bmpHero1->MakeTransparent(bmpHero1->GetPixel(0, 0));
 
@@ -177,6 +166,7 @@ namespace JuegoFinal {
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
             controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
 
+            lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();
             timer->Enabled = true;
         }
 
@@ -184,16 +174,13 @@ namespace JuegoFinal {
         {
             frameCount++;
 
-            // Actualizar tiempo cada segundo (60 frames)
             if (frameCount % 60 == 0 && timeRemaining > 0) {
                 timeRemaining--;
                 lbTiempo->Text = "⏱️ Tiempo: " + timeRemaining.ToString() + "s";
 
-                // Agregar puntos por sobrevivir
                 gameState->addScore(10);
                 lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();
 
-                // Verificar si es momento de spawn del portal
                 if (timeRemaining <= requiredTime && !portalSpawned) {
                     controller->spawnPortal(panelJuego->Width, panelJuego->Height);
                     portalSpawned = true;
@@ -202,15 +189,12 @@ namespace JuegoFinal {
                 }
             }
 
-            // Mover enemigos y héroe
             controller->moveEverything(buffer->Graphics);
             controller->collision();
 
-            // Actualizar vidas
             int vidas = controller->getVidasHero();
             lbVidas->Text = "❤️ Vidas: " + vidas.ToString();
 
-            // Cambiar color de vidas según cantidad
             if (vidas <= 2) {
                 lbVidas->ForeColor = Color::Red;
             }
@@ -221,7 +205,6 @@ namespace JuegoFinal {
                 lbVidas->ForeColor = Color::LimeGreen;
             }
 
-            // Dibujar todo
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
 
@@ -230,14 +213,12 @@ namespace JuegoFinal {
 
             buffer->Render(g);
 
-            // Verificar colisión con portal
             if (portalSpawned && controller->checkPortalCollision()) {
                 timer->Enabled = false;
                 MostrarPantallaTransicion();
                 return;
             }
 
-            // Verificar victoria (tiempo completo)
             if (timeRemaining <= 0 && controller->getVidasHero() > 0) {
                 if (!portalSpawned) {
                     controller->spawnPortal(panelJuego->Width, panelJuego->Height);
@@ -247,13 +228,12 @@ namespace JuegoFinal {
                 }
             }
 
-            // Verificar derrota (sin vidas)
             if (controller->getVidasHero() <= 0) {
                 timer->Enabled = false;
                 MessageBox::Show(
                     "GAME OVER!\n\n" +
                     "Puntuación Final: " + gameState->score.ToString() + "\n" +
-                    "Tiempo Sobrevivido: " + (60 - timeRemaining).ToString() + " segundos",
+                    "Llegaste al Nivel 2",
                     "Derrota",
                     MessageBoxButtons::OK,
                     MessageBoxIcon::Error
@@ -263,32 +243,30 @@ namespace JuegoFinal {
         }
 
         void MostrarPantallaTransicion() {
-            // Bonus por completar nivel
-            gameState->addScore(500);
+            gameState->addScore(1000);
 
             MessageBox::Show(
-                "¡NIVEL 1 COMPLETADO!\n\n" +
-                "🎉 Entraste al portal\n" +
+                "¡NIVEL 2 COMPLETADO!\n\n" +
+                "🎉 ¡Increíble!\n" +
                 "⭐ Puntuación: " + gameState->score.ToString() + "\n" +
-                "⏱️ Tiempo: " + (60 - timeRemaining).ToString() + "s\n\n" +
-                "Preparándote para el NIVEL 2...",
+                "⏱️ Tiempo: " + (90 - timeRemaining).ToString() + "s\n\n" +
+                "Preparándote para el NIVEL 3 FINAL...",
                 "¡Victoria!",
                 MessageBoxButtons::OK,
                 MessageBoxIcon::Information
             );
 
-            // Avanzar al siguiente nivel
             gameState->nextLevel();
 
-            // Abrir Nivel 2
+            // Abrir Nivel 3
             this->Hide();
-            Nivel2^ nivel2 = gcnew Nivel2();
-            nivel2->ShowDialog();
-            delete nivel2;
+            Nivel3^ nivel3 = gcnew Nivel3();
+            nivel3->ShowDialog();
+            delete nivel3;
             this->Close();
         }
 
-        void Nivel1_KeyDown(Object^ sender, KeyEventArgs^ e)
+        void Nivel2_KeyDown(Object^ sender, KeyEventArgs^ e)
         {
             switch (e->KeyCode) {
             case Keys::A:
@@ -306,10 +284,9 @@ namespace JuegoFinal {
             case Keys::Escape:
                 timer->Enabled = false;
                 if (MessageBox::Show(
-                    "¿Volver al menú?\n\nPerderás tu progreso actual",
+                    "¿Volver al menú?",
                     "Pausa",
-                    MessageBoxButtons::YesNo,
-                    MessageBoxIcon::Question) == System::Windows::Forms::DialogResult::Yes)
+                    MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes)
                 {
                     this->Close();
                 }

@@ -1,32 +1,31 @@
 #pragma once
 
-using namespace System;
-
 namespace JuegoFinal {
 
-    public ref class GameStateManager {
+    using namespace System;
+
+    public ref class GameStateManager
+    {
     private:
         static GameStateManager^ instance = nullptr;
 
         GameStateManager() {
-            resetGame();
+            selectedHero = 1;
+            currentLevel = 1;
+            score = 0;
+            totalEnemiesKilled = 0;
+            gameStarted = false;
         }
 
     public:
-        // Información del jugador
-        String^ playerName;
-        int selectedHero;  // 1 o 2
+        // Estado del juego
+        int selectedHero;       // 1 = Hero1, 2 = Hero2, 3 = IA
+        int currentLevel;       // Nivel actual (0 = habitación, 1-3 = niveles)
+        int score;              // Puntuación total
+        int totalEnemiesKilled; // Enemigos eliminados
+        bool gameStarted;       // Si el juego ha iniciado
 
-        // Progreso del juego
-        int currentLevel;  // 1, 2, 3
-        int totalScore;
-        int vidasRestantes;
-
-        // Estadísticas
-        int enemiesDefeated;
-        int totalTimePlayed;
-
-        // Singleton - obtener instancia única
+        // Singleton pattern
         static GameStateManager^ getInstance() {
             if (instance == nullptr) {
                 instance = gcnew GameStateManager();
@@ -34,37 +33,53 @@ namespace JuegoFinal {
             return instance;
         }
 
-        // Reiniciar juego
+        // Reiniciar estado del juego
         void resetGame() {
-            playerName = "";
-            selectedHero = 0;
             currentLevel = 1;
-            totalScore = 0;
-            vidasRestantes = 0;
-            enemiesDefeated = 0;
-            totalTimePlayed = 0;
+            score = 0;
+            totalEnemiesKilled = 0;
+            gameStarted = true;
         }
 
-        // Pasar al siguiente nivel
+        // Avanzar al siguiente nivel
         void nextLevel() {
             currentLevel++;
         }
 
         // Agregar puntos
         void addScore(int points) {
-            totalScore += points;
+            score += points;
         }
 
-        // Guardar vidas
-        void setVidas(int vidas) {
-            vidasRestantes = vidas;
+        // Agregar enemigo eliminado
+        void addEnemyKilled() {
+            totalEnemiesKilled++;
         }
 
-        // Agregar tiempo
-        void addTime(int seconds) {
-            totalTimePlayed += seconds;
+        // Obtener información del héroe seleccionado
+        System::String^ getHeroName() {
+            switch (selectedHero) {
+            case 1: return "VELOCISTA";
+            case 2: return "TANQUE";
+            case 3: return "IA";
+            default: return "DESCONOCIDO";
+            }
+        }
+
+        int getHeroSpeed() {
+            switch (selectedHero) {
+            case 1: return 15;
+            case 2: return 8;
+            default: return 10;
+            }
+        }
+
+        int getHeroLives() {
+            switch (selectedHero) {
+            case 1: return 5;
+            case 2: return 8;
+            default: return 3;
+            }
         }
     };
-
-} // namespace JuegoFinal
-
+}

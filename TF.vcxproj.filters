@@ -48,9 +48,6 @@
     <ClInclude Include="Controladores\Controller.h">
       <Filter>Controladores</Filter>
     </ClInclude>
-    <ClInclude Include="GameStateManager.h">
-      <Filter>Controladores</Filter>
-    </ClInclude>
     <ClInclude Include="Forms\MenuPrincipal.h">
       <Filter>Forms</Filter>
     </ClInclude>
@@ -62,6 +59,18 @@
     </ClInclude>
     <ClInclude Include="Controladores\GameConfig.h">
       <Filter>Controladores</Filter>
+    </ClInclude>
+    <ClInclude Include="Controladores\GameStateManager.h">
+      <Filter>Controladores</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\Portal.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\Nivel2.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\Nivel3.h">
+      <Filter>Forms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +96,12 @@
       <Filter>Forms</Filter>
     </ClCompile>
     <ClCompile Include="Forms\Nivel1.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\Nivel2.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\Nivel3.cpp">
       <Filter>Forms</Filter>
     </ClCompile>
   </ItemGroup>

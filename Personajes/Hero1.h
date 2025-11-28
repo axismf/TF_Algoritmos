@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Character.h"
 
 class Hero1 : public Character {
@@ -9,8 +9,8 @@ public:
 	Hero1(int width, int height) : Character(width, height) {
 		x = 0;
 		y = 50;
-		dx = dy = 10;
-		vidas = rand() % 7 + 2;
+		dx = dy = 15;  // ⬅️ MÁS RÁPIDO (era 10)
+		vidas = 5;     // ⬅️ FIJO, 5 vidas (era random)
 	}
 
 	~Hero1() {}

@@ -117,20 +117,27 @@
   <ItemGroup>
     <ClInclude Include="Controladores\Controller.h" />
     <ClInclude Include="Controladores\GameConfig.h" />
+    <ClInclude Include="Controladores\GameStateManager.h" />
     <ClInclude Include="Forms\MenuPrincipal.h" />
     <ClInclude Include="Forms\Nivel1.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Forms\Nivel2.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Forms\Nivel3.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Forms\SelectCharacterForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="Personajes\Character.h" />
     <ClInclude Include="Personajes\Enemy1.h" />
     <ClInclude Include="Personajes\Enemy2.h" />
     <ClInclude Include="Personajes\Enemy3.h" />
     <ClInclude Include="Personajes\Hero1.h" />
     <ClInclude Include="Personajes\Hero2.h" />
+    <ClInclude Include="Personajes\Portal.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Background\fondo1.png">
@@ -160,6 +167,8 @@
   <ItemGroup>
     <ClCompile Include="Forms\MenuPrincipal.cpp" />
     <ClCompile Include="Forms\Nivel1.cpp" />
+    <ClCompile Include="Forms\Nivel2.cpp" />
+    <ClCompile Include="Forms\Nivel3.cpp" />
     <ClCompile Include="Forms\SelectCharacterForm.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
