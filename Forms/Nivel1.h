@@ -39,6 +39,8 @@ namespace JuegoFinal {
         int frameCount;
         int requiredTime; // Tiempo requerido para spawn del portal
         bool portalSpawned;
+        bool storyShown; // Variable para controlar la historia
+        int storyDelayCounter; // Contador para esperar 3 segundos
         GameStateManager^ gameState;
 
     public:
@@ -150,6 +152,8 @@ namespace JuegoFinal {
             requiredTime = 30; // Sobrevivir 30 segundos para que aparezca el portal
             frameCount = 0;
             portalSpawned = false;
+            storyShown = false; // Inicializar variable de historia
+            storyDelayCounter = 0; // Reiniciar contador
 
             g = panelJuego->CreateGraphics();
             space = BufferedGraphicsManager::Current;
@@ -183,6 +187,40 @@ namespace JuegoFinal {
 
         void timer_Tick(Object^ sender, EventArgs^ e)
         {
+            // ==========================================
+            // HISTORIA CON RETRASO (3 Segundos)
+            // ==========================================
+            if (!storyShown) {
+                storyDelayCounter++;
+
+                // Dibujamos el fondo y personajes estáticos para que se vea el mapa
+                buffer->Graphics->Clear(Color::Black);
+                buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
+                controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
+                buffer->Render(g);
+
+                // Esperamos 180 frames (aprox 3 segundos) antes de mostrar el mensaje
+                if (storyDelayCounter >= 180) {
+                    timer->Enabled = false; // Pausar timer para que no siga contando mientras lees
+
+                    MessageBox::Show(
+                        "¡No puede ser!, No fue un sueño",
+                        "Historia",
+                        MessageBoxButtons::OK,
+                        MessageBoxIcon::Exclamation
+                    );
+
+                    storyShown = true;
+                    timer->Enabled = true; // Reanudar juego
+                }
+
+                // IMPORTANTE: Return aquí evita que se ejecute la lógica de movimiento/colisión
+                // mientras esperamos, así no te matan.
+                return;
+            }
+
+            // --- LÓGICA NORMAL DEL JUEGO (Se ejecuta después de la historia) ---
+
             frameCount++;
 
             // Actualizar tiempo cada segundo (60 frames)

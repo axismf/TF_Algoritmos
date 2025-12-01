@@ -33,16 +33,16 @@ namespace JuegoFinal {
         Label^ lbObjetivo;
         Label^ lbNivel;
         Label^ lbInstrucciones;
-        Label^ lbCoordMouse; // Para ver coordenadas
+        Label^ lbCoordMouse;
         Panel^ panelJuego;
         Panel^ panelHUD;
         Timer^ timer;
 
         int timeRemaining;
-        int frameCount;
+        int frameCount; // Usaremos conteo de frames (Lógica Mata Pájaros)
         int requiredTime;
         bool portalSpawned;
-        bool storyShown; // Variable para controlar si ya se mostró la historia
+        bool storyShown;
         GameStateManager^ gameState;
 
     public:
@@ -73,7 +73,7 @@ namespace JuegoFinal {
             this->components = gcnew System::ComponentModel::Container();
             this->SuspendLayout();
 
-            this->Text = L"Nivel 1 - Aprende a Jugar";
+            this->Text = L"Nivel 0 - Tutorial";
             this->ClientSize = System::Drawing::Size(1200, 700);
             this->StartPosition = FormStartPosition::CenterScreen;
             this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
@@ -90,7 +90,7 @@ namespace JuegoFinal {
             this->Controls->Add(panelHUD);
 
             lbNivel = gcnew Label();
-            lbNivel->Text = L"Nivel 1";
+            lbNivel->Text = L"TUTORIAL";
             lbNivel->Font = gcnew Drawing::Font("Arial", 18.0f, FontStyle::Bold);
             lbNivel->ForeColor = Color::LimeGreen;
             lbNivel->AutoSize = true;
@@ -102,7 +102,7 @@ namespace JuegoFinal {
             lbVidas->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbVidas->ForeColor = Color::Red;
             lbVidas->AutoSize = true;
-            lbVidas->Location = Point(230, 28);
+            lbVidas->Location = Point(250, 28);
             panelHUD->Controls->Add(lbVidas);
 
             lbTiempo = gcnew Label();
@@ -110,7 +110,7 @@ namespace JuegoFinal {
             lbTiempo->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbTiempo->ForeColor = Color::Yellow;
             lbTiempo->AutoSize = true;
-            lbTiempo->Location = Point(460, 28);
+            lbTiempo->Location = Point(480, 28);
             panelHUD->Controls->Add(lbTiempo);
 
             lbPuntos = gcnew Label();
@@ -118,7 +118,7 @@ namespace JuegoFinal {
             lbPuntos->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbPuntos->ForeColor = Color::Gold;
             lbPuntos->AutoSize = true;
-            lbPuntos->Location = Point(730, 28);
+            lbPuntos->Location = Point(750, 28);
             panelHUD->Controls->Add(lbPuntos);
 
             lbObjetivo = gcnew Label();
@@ -126,7 +126,7 @@ namespace JuegoFinal {
             lbObjetivo->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
             lbObjetivo->ForeColor = Color::LightGreen;
             lbObjetivo->AutoSize = true;
-            lbObjetivo->Location = Point(880, 28);
+            lbObjetivo->Location = Point(950, 30);
             panelHUD->Controls->Add(lbObjetivo);
 
             // Label para coordenadas del mouse
@@ -143,12 +143,13 @@ namespace JuegoFinal {
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
-            panelJuego->MouseMove += gcnew MouseEventHandler(this, &Nivel0::panelJuego_MouseMove);
             this->Controls->Add(panelJuego);
 
             // Timer
             timer = gcnew Timer(this->components);
-            timer->Interval = 16;
+            // LÓGICA MATA PÁJAROS: 50ms = 20 Frames por Segundo.
+            // Esto es más lento que 60fps, pero garantiza que cada frame tenga tiempo de procesarse.
+            timer->Interval = 50;
             timer->Tick += gcnew EventHandler(this, &Nivel0::timer_Tick);
 
             this->ResumeLayout(false);
@@ -157,11 +158,11 @@ namespace JuegoFinal {
         void InitializeGame()
         {
             gameState = GameStateManager::getInstance();
-            timeRemaining = 30; // 30 segundos para encontrar la salida
+            timeRemaining = 30;
             requiredTime = 0;
             frameCount = 0;
             portalSpawned = false;
-            storyShown = false; // Inicializamos la bandera de la historia
+            storyShown = false;
 
             g = panelJuego->CreateGraphics();
             space = BufferedGraphicsManager::Current;
@@ -184,34 +185,36 @@ namespace JuegoFinal {
 
             bmpFondo = gcnew Bitmap("Assets/Background/fondo0.png");
 
-            // Crear mapa de colisiones
             collisionMap = new CollisionMap();
             collisionMap->cargarMapaNivel1();
 
             int selectedHero = gameState->selectedHero;
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
-
-            // Establecer spawn inicial del tutorial
             controller->setInitialSpawn(500, 400);
-
-            // Activar portal/puerta inmediatamente
             controller->spawnPortal(60, 290);
-
-            // HACER EL PORTAL INVISIBLE (Requiere el cambio anterior en Controller.h)
-            controller->setPortalVisible(false);
+            controller->setPortalVisible(false); // Invisible pero activo
 
             portalSpawned = true;
-
             timer->Enabled = true;
         }
 
         void timer_Tick(Object^ sender, EventArgs^ e)
         {
             // ==========================================
-            // HISTORIA AL INICIO DEL NIVEL
+            // HISTORIA (SOLUCIÓN PANTALLA NEGRA)
             // ==========================================
             if (!storyShown) {
-                timer->Enabled = false; // Pausar juego para leer
+                // 1. DIBUJAR EL JUEGO PRIMERO
+                buffer->Graphics->Clear(Color::Black);
+                buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
+                DibujarInstrucciones();
+                controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
+
+                // CRUCIAL: Renderizar AHORA para que el usuario vea el juego de fondo
+                buffer->Render(g);
+
+                // 2. PAUSAR Y MOSTRAR MENSAJES
+                timer->Enabled = false;
 
                 MessageBox::Show(
                     L"Qué sueño tan raro...",
@@ -227,33 +230,26 @@ namespace JuegoFinal {
                     MessageBoxIcon::Information
                 );
 
-                MessageBox::Show(
-                    L"Voy a salir a dar un paseo.",
-                    L"Historia",
-                    MessageBoxButtons::OK,
-                    MessageBoxIcon::Information
-                );
-
-                storyShown = true; // Marcar como leída
-                timer->Enabled = true; // Reanudar juego
-                return; // Salir de este tick para no procesar lógica extra
+                storyShown = true;
+                timer->Enabled = true; // Reanudar
+                return;
             }
 
+            // ==========================================
+            // LÓGICA DE TIEMPO (20 FPS)
+            // ==========================================
             frameCount++;
 
-            if (frameCount % 60 == 0 && timeRemaining > 0) {
+            // Si corremos a 20 FPS, cada 20 frames es 1 segundo real
+            if (frameCount % 20 == 0 && timeRemaining > 0) {
                 timeRemaining--;
                 lbTiempo->Text = "Tiempo: " + timeRemaining.ToString() + "s";
 
-                // Efecto visual si queda poco tiempo
                 if (timeRemaining <= 10) {
                     lbTiempo->ForeColor = Color::Red;
                 }
             }
 
-            // ==========================================
-            // CONDICIÓN DE DERROTA POR TIEMPO
-            // ==========================================
             if (timeRemaining <= 0) {
                 timer->Enabled = false;
                 MessageBox::Show(
@@ -287,7 +283,6 @@ namespace JuegoFinal {
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
 
-            // Dibujar instrucciones en pantalla
             DibujarInstrucciones();
 
             controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2,
@@ -301,7 +296,6 @@ namespace JuegoFinal {
                 return;
             }
 
-            // Derrota por vidas (aunque no hay enemigos en tutorial por ahora)
             if (controller->getVidasHero() <= 0) {
                 timer->Enabled = false;
                 this->Close();
@@ -325,12 +319,12 @@ namespace JuegoFinal {
             delete font;
             delete brush;
 
-            // Dibujar objetivo
+            // Texto ARRIBA
             System::Drawing::Font^ font2 = gcnew System::Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             SolidBrush^ brush2 = gcnew SolidBrush(Color::Yellow);
 
-            String^ objetivo = "¡VE LA PUERTA ANARANJADA!";
-            buffer->Graphics->DrawString(objetivo, font2, brush2, 350, 520);
+            String^ objetivo = "¡ENCUENTRA LA SALIDA OCULTA!";
+            buffer->Graphics->DrawString(objetivo, font2, brush2, 400.0f, 150.0f);
 
             delete font2;
             delete brush2;
@@ -341,9 +335,9 @@ namespace JuegoFinal {
 
             MessageBox::Show(
                 "¡LO ENCONTRASTE!\n\n" +
-                "Nivel 1 completado.\n" +
+                "Tutorial completado.\n" +
                 "Puntuacion: " + gameState->score.ToString() + "\n\n" +
-                "Preparate para el NIVEL 2...",
+                "Preparate para el NIVEL 1...",
                 "¡Excelente!",
                 MessageBoxButtons::OK,
                 MessageBoxIcon::Information
@@ -360,74 +354,49 @@ namespace JuegoFinal {
 
         void Nivel0_KeyDown(Object^ sender, KeyEventArgs^ e)
         {
-            // Guardar posición anterior
             Rectangle heroRect = controller->getHeroRectangle();
             int posXAnterior = heroRect.X;
             int posYAnterior = heroRect.Y;
 
-            // Realizar movimiento
             switch (e->KeyCode) {
-            case Keys::A:
-                controller->moveHero(buffer->Graphics, 'A');
-                break;
-            case Keys::D:
-                controller->moveHero(buffer->Graphics, 'D');
-                break;
-            case Keys::W:
-                controller->moveHero(buffer->Graphics, 'W');
-                break;
-            case Keys::S:
-                controller->moveHero(buffer->Graphics, 'S');
-                break;
+            case Keys::A: controller->moveHero(buffer->Graphics, 'A'); break;
+            case Keys::D: controller->moveHero(buffer->Graphics, 'D'); break;
+            case Keys::W: controller->moveHero(buffer->Graphics, 'W'); break;
+            case Keys::S: controller->moveHero(buffer->Graphics, 'S'); break;
             case Keys::Escape:
                 timer->Enabled = false;
-                if (MessageBox::Show(
-                    "Salir del juego?",
-                    "Pausa",
-                    MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes)
-                {
+                if (MessageBox::Show("Salir del juego?", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) {
                     this->Close();
                 }
                 else {
                     timer->Enabled = true;
                 }
                 return;
-            default:
-                return;
+            default: return;
             }
 
-            // Obtener nueva posición
             Rectangle newRect = controller->getHeroRectangle();
             int posX = newRect.X;
             int posY = newRect.Y;
             int ancho = newRect.Width;
             int alto = newRect.Height;
 
-            // Límites de pantalla
             int anchoFrm = (int)buffer->Graphics->VisibleClipBounds.Width;
             int altoFrm = (int)buffer->Graphics->VisibleClipBounds.Height;
 
             if (posX < 0) posX = 0;
             if (posY < 0) posY = 0;
-            if (posX + ancho > anchoFrm)
-                posX = anchoFrm - ancho;
-            if (posY + alto > altoFrm)
-                posY = altoFrm - alto;
+            if (posX + ancho > anchoFrm) posX = anchoFrm - ancho;
+            if (posY + alto > altoFrm) posY = altoFrm - alto;
 
-            // Verificar colisión con paredes del mapa
             if (collisionMap->hayColision(posX, posY, ancho, alto)) {
-                // Si hay colisión, revertir a posición anterior
                 posX = posXAnterior;
                 posY = posYAnterior;
             }
 
-            // Aplicar posición final
             controller->setHeroPosition(posX, posY);
         }
 
-        void panelJuego_MouseMove(Object^ sender, MouseEventArgs^ e) {
-            // Mostrar coordenadas del mouse en tiempo real
-            lbCoordMouse->Text = "Mouse: (" + e->X + ", " + e->Y + ")";
-        }
+        
     };
 }
