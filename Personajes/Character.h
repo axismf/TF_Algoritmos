@@ -28,6 +28,12 @@ public:
 	int getX() { return x; }
 	int getY() { return y; }
 
+	// --- NUEVO MÉTODO AGREGADO ---
+	void setPosition(int newX, int newY) {
+		x = newX;
+		y = newY;
+	}
+	// -----------------------------
 
 	Rectangle getRectangle() {
 		return Rectangle(x, y, width * 0.4, height * 0.4);
