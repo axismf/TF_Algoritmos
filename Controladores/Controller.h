@@ -64,13 +64,14 @@ public:
             int zona = rand() % 3;
             switch (zona) {
             case 0: // Parking (Izquierda)
-                zX = 50; zY = 150; zW = 300; zH = 250;
+                zX = 65; zY = 10; zW =410; zH = 380;
                 break;
             case 1: // Avenida (Centro)
-                zX = 480; zY = 50; zW = 140; zH = 600;
+                zX = 540; zY = 50; zW = 260; zH = 480;
+               
                 break;
             case 2: // Vereda (Derecha Abajo)
-                zX = 700; zY = 450; zW = 400; zH = 150;
+                zX = 810; zY = 190; zW = 300; zH = 80;
                 break;
             }
         }
@@ -150,8 +151,8 @@ public:
             g->DrawRectangle(spawnPen, 50, 150, 300, 250);
 
             // Avenida
-            g->FillRectangle(spawnBrush, 480, 50, 140, 600);
-            g->DrawRectangle(spawnPen, 480, 50, 140, 600);
+            g->FillRectangle(spawnBrush, 540, 50, 260, 480);
+            g->DrawRectangle(spawnPen, 540, 50, 260, 480);
 
             // Vereda
             g->FillRectangle(spawnBrush, 700, 450, 400, 150);
