@@ -39,7 +39,7 @@ namespace JuegoFinal {
         Timer^ timer;
 
         int timeRemaining;
-        int frameCount; // Usaremos conteo de frames (Lógica Mata Pájaros)
+        int frameCount;
         int requiredTime;
         bool portalSpawned;
         bool storyShown;
@@ -54,15 +54,9 @@ namespace JuegoFinal {
 
         ~Nivel0()
         {
-            if (controller != nullptr) {
-                delete controller;
-            }
-            if (collisionMap != nullptr) {
-                delete collisionMap;
-            }
-            if (components != nullptr) {
-                delete components;
-            }
+            if (controller != nullptr) delete controller;
+            if (collisionMap != nullptr) delete collisionMap;
+            if (components != nullptr) delete components;
         }
 
     private:
@@ -72,7 +66,6 @@ namespace JuegoFinal {
         {
             this->components = gcnew System::ComponentModel::Container();
             this->SuspendLayout();
-
             this->Text = L"Nivel 0 - Tutorial";
             this->ClientSize = System::Drawing::Size(1200, 700);
             this->StartPosition = FormStartPosition::CenterScreen;
@@ -122,34 +115,22 @@ namespace JuegoFinal {
             panelHUD->Controls->Add(lbPuntos);
 
             lbObjetivo = gcnew Label();
-            lbObjetivo->Text = L"¡Encuentra la SALIDA antes del tiempo!";
+            lbObjetivo->Text = L"¡Encuentra la SALIDA OCULTA!";
             lbObjetivo->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
             lbObjetivo->ForeColor = Color::LightGreen;
             lbObjetivo->AutoSize = true;
             lbObjetivo->Location = Point(950, 30);
             panelHUD->Controls->Add(lbObjetivo);
 
-            // Label para coordenadas del mouse
-            lbCoordMouse = gcnew Label();
-            lbCoordMouse->Text = L"Mouse: (0, 0)";
-            lbCoordMouse->Font = gcnew Drawing::Font("Arial", 11.0f, FontStyle::Bold);
-            lbCoordMouse->ForeColor = Color::Cyan;
-            lbCoordMouse->AutoSize = true;
-            lbCoordMouse->Location = Point(20, 5);
-            panelHUD->Controls->Add(lbCoordMouse);
-
-            // Panel de juego
             panelJuego = gcnew Panel();
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
             this->Controls->Add(panelJuego);
 
-            // Timer
+            // --- CORRECCIÓN DE VELOCIDAD ---
             timer = gcnew Timer(this->components);
-            // LÓGICA MATA PÁJAROS: 50ms = 20 Frames por Segundo.
-            // Esto es más lento que 60fps, pero garantiza que cada frame tenga tiempo de procesarse.
-            timer->Interval = 50;
+            timer->Interval = 16; // 60 FPS (Rápido y fluido)
             timer->Tick += gcnew EventHandler(this, &Nivel0::timer_Tick);
 
             this->ResumeLayout(false);
@@ -170,19 +151,14 @@ namespace JuegoFinal {
 
             bmpHero1 = gcnew Bitmap("Assets/Sprites/prota.png");
             bmpHero1->MakeTransparent(bmpHero1->GetPixel(0, 0));
-
             bmpHero2 = gcnew Bitmap("Assets/Sprites/IA.png");
             bmpHero2->MakeTransparent(bmpHero2->GetPixel(0, 0));
-
             bmpEnemy1 = gcnew Bitmap("Assets/Sprites/roboto.png");
             bmpEnemy1->MakeTransparent(bmpEnemy1->GetPixel(0, 0));
-
             bmpEnemy2 = gcnew Bitmap("Assets/Sprites/roboto.png");
             bmpEnemy2->MakeTransparent(bmpEnemy2->GetPixel(0, 0));
-
             bmpEnemy3 = gcnew Bitmap("Assets/Sprites/roboto.png");
             bmpEnemy3->MakeTransparent(bmpEnemy3->GetPixel(0, 0));
-
             bmpFondo = gcnew Bitmap("Assets/Background/fondo0.png");
 
             collisionMap = new CollisionMap();
@@ -192,7 +168,7 @@ namespace JuegoFinal {
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
             controller->setInitialSpawn(500, 400);
             controller->spawnPortal(60, 290);
-            controller->setPortalVisible(false); // Invisible pero activo
+            controller->setPortalVisible(false); // Invisible
 
             portalSpawned = true;
             timer->Enabled = true;
@@ -200,66 +176,35 @@ namespace JuegoFinal {
 
         void timer_Tick(Object^ sender, EventArgs^ e)
         {
-            // ==========================================
-            // HISTORIA (SOLUCIÓN PANTALLA NEGRA)
-            // ==========================================
+            // LÓGICA DE HISTORIA (Igual que antes)
             if (!storyShown) {
-                // 1. DIBUJAR EL JUEGO PRIMERO
                 buffer->Graphics->Clear(Color::Black);
                 buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
                 DibujarInstrucciones();
                 controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
-
-                // CRUCIAL: Renderizar AHORA para que el usuario vea el juego de fondo
                 buffer->Render(g);
 
-                // 2. PAUSAR Y MOSTRAR MENSAJES
                 timer->Enabled = false;
-
-                MessageBox::Show(
-                    L"Qué sueño tan raro...",
-                    L"Historia",
-                    MessageBoxButtons::OK,
-                    MessageBoxIcon::None
-                );
-
-                MessageBox::Show(
-                    L"Soñé que el mundo ahora estaba dominado por la IA...",
-                    L"Historia",
-                    MessageBoxButtons::OK,
-                    MessageBoxIcon::Information
-                );
-
+                MessageBox::Show(L"Qué sueño tan raro...", L"Historia", MessageBoxButtons::OK, MessageBoxIcon::None);
+                MessageBox::Show(L"Soñé que el mundo ahora estaba dominado por la IA...", L"Historia", MessageBoxButtons::OK, MessageBoxIcon::Information);
                 storyShown = true;
-                timer->Enabled = true; // Reanudar
+                timer->Enabled = true;
                 return;
             }
 
-            // ==========================================
-            // LÓGICA DE TIEMPO (20 FPS)
-            // ==========================================
+            // --- LÓGICA DE TIEMPO AJUSTADA ---
             frameCount++;
 
-            // Si corremos a 20 FPS, cada 20 frames es 1 segundo real
-            if (frameCount % 20 == 0 && timeRemaining > 0) {
+            // Ahora calculamos 1 segundo cada 60 frames (porque vamos a 60 FPS)
+            if (frameCount % 60 == 0 && timeRemaining > 0) {
                 timeRemaining--;
                 lbTiempo->Text = "Tiempo: " + timeRemaining.ToString() + "s";
-
-                if (timeRemaining <= 10) {
-                    lbTiempo->ForeColor = Color::Red;
-                }
+                if (timeRemaining <= 10) lbTiempo->ForeColor = Color::Red;
             }
 
             if (timeRemaining <= 0) {
                 timer->Enabled = false;
-                MessageBox::Show(
-                    "¡SE ACABÓ EL TIEMPO!\n\n" +
-                    "No lograste encontrar la salida a tiempo.\n" +
-                    "Inténtalo de nuevo.",
-                    "GAME OVER",
-                    MessageBoxButtons::OK,
-                    MessageBoxIcon::Error
-                );
+                MessageBox::Show("¡SE ACABÓ EL TIEMPO!", "GAME OVER", MessageBoxButtons::OK, MessageBoxIcon::Error);
                 this->Close();
                 return;
             }
@@ -269,25 +214,14 @@ namespace JuegoFinal {
 
             int vidas = controller->getVidasHero();
             lbVidas->Text = "Vidas: " + vidas.ToString();
-
-            if (vidas <= 2) {
-                lbVidas->ForeColor = Color::Red;
-            }
-            else if (vidas <= 4) {
-                lbVidas->ForeColor = Color::Orange;
-            }
-            else {
-                lbVidas->ForeColor = Color::LimeGreen;
-            }
+            if (vidas <= 2) lbVidas->ForeColor = Color::Red;
+            else if (vidas <= 4) lbVidas->ForeColor = Color::Orange;
+            else lbVidas->ForeColor = Color::LimeGreen;
 
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
-
             DibujarInstrucciones();
-
-            controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2,
-                bmpEnemy1, bmpEnemy2, bmpEnemy3);
-
+            controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
             buffer->Render(g);
 
             if (portalSpawned && controller->checkPortalCollision()) {
@@ -302,49 +236,17 @@ namespace JuegoFinal {
             }
         }
 
-        void DibujarInstrucciones()
-        {
+        void DibujarInstrucciones() {
             System::Drawing::Font^ font = gcnew System::Drawing::Font("Arial", 16.0f, FontStyle::Bold);
             SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(200, 255, 255, 255));
-
-            String^ texto =
-                "CONTROLES:\n\n" +
-                "W - Arriba\n" +
-                "A - Izquierda\n" +
-                "S - Abajo\n" +
-                "D - Derecha\n\n";
-
-            buffer->Graphics->DrawString(texto, font, brush, 50.0f, 50.0f);
-
-            delete font;
-            delete brush;
-
-            // Texto ARRIBA
-            System::Drawing::Font^ font2 = gcnew System::Drawing::Font("Arial", 14.0f, FontStyle::Bold);
-            SolidBrush^ brush2 = gcnew SolidBrush(Color::Yellow);
-
-            String^ objetivo = "¡ENCUENTRA LA SALIDA OCULTA!";
-            buffer->Graphics->DrawString(objetivo, font2, brush2, 400.0f, 150.0f);
-
-            delete font2;
-            delete brush2;
+            buffer->Graphics->DrawString("CONTROLES:\nW, A, S, D", font, brush, 50.0f, 50.0f);
+            delete font; delete brush;
         }
 
         void MostrarPantallaTransicion() {
             gameState->addScore(100);
-
-            MessageBox::Show(
-                "¡LO ENCONTRASTE!\n\n" +
-                "Tutorial completado.\n" +
-                "Puntuacion: " + gameState->score.ToString() + "\n\n" +
-                "Preparate para el NIVEL 1...",
-                "¡Excelente!",
-                MessageBoxButtons::OK,
-                MessageBoxIcon::Information
-            );
-
+            MessageBox::Show("¡LO ENCONTRASTE!\nPreparate para el NIVEL 1...", "¡Excelente!", MessageBoxButtons::OK, MessageBoxIcon::Information);
             gameState->nextLevel();
-
             this->Hide();
             Nivel1^ nivel1 = gcnew Nivel1();
             nivel1->ShowDialog();
@@ -352,8 +254,7 @@ namespace JuegoFinal {
             this->Close();
         }
 
-        void Nivel0_KeyDown(Object^ sender, KeyEventArgs^ e)
-        {
+        void Nivel0_KeyDown(Object^ sender, KeyEventArgs^ e) {
             Rectangle heroRect = controller->getHeroRectangle();
             int posXAnterior = heroRect.X;
             int posYAnterior = heroRect.Y;
@@ -365,38 +266,16 @@ namespace JuegoFinal {
             case Keys::S: controller->moveHero(buffer->Graphics, 'S'); break;
             case Keys::Escape:
                 timer->Enabled = false;
-                if (MessageBox::Show("Salir del juego?", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) {
-                    this->Close();
-                }
-                else {
-                    timer->Enabled = true;
-                }
+                if (MessageBox::Show("¿Salir?", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) this->Close();
+                else timer->Enabled = true;
                 return;
-            default: return;
             }
 
+            // Colisiones con paredes
             Rectangle newRect = controller->getHeroRectangle();
-            int posX = newRect.X;
-            int posY = newRect.Y;
-            int ancho = newRect.Width;
-            int alto = newRect.Height;
-
-            int anchoFrm = (int)buffer->Graphics->VisibleClipBounds.Width;
-            int altoFrm = (int)buffer->Graphics->VisibleClipBounds.Height;
-
-            if (posX < 0) posX = 0;
-            if (posY < 0) posY = 0;
-            if (posX + ancho > anchoFrm) posX = anchoFrm - ancho;
-            if (posY + alto > altoFrm) posY = altoFrm - alto;
-
-            if (collisionMap->hayColision(posX, posY, ancho, alto)) {
-                posX = posXAnterior;
-                posY = posYAnterior;
+            if (collisionMap->hayColision(newRect.X, newRect.Y, newRect.Width, newRect.Height)) {
+                controller->setHeroPosition(posXAnterior, posYAnterior);
             }
-
-            controller->setHeroPosition(posX, posY);
         }
-
-        
     };
 }
