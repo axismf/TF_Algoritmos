@@ -26,6 +26,9 @@ namespace JuegoFinal {
         bool portalSpawned; bool storyShown;
         GameStateManager^ gameState;
 
+        // DEBUG: Coordenadas Mouse
+        Point mousePos;
+
     public:
         Nivel1(void) { InitializeComponent(); InitializeGame(); }
         ~Nivel1() {
@@ -63,12 +66,21 @@ namespace JuegoFinal {
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
+
+            // CONECTAR EVENTO MOUSE
+            this->panelJuego->MouseMove += gcnew MouseEventHandler(this, &Nivel1::Nivel1_MouseMove);
+
             this->Controls->Add(panelJuego);
 
             timer = gcnew Timer(this->components);
-            timer->Interval = 16; // 60 FPS
+            timer->Interval = 16;
             timer->Tick += gcnew EventHandler(this, &Nivel1::timer_Tick);
             this->ResumeLayout(false);
+        }
+
+        // CAPTURAR MOUSE
+        void Nivel1_MouseMove(Object^ sender, MouseEventArgs^ e) {
+            mousePos = e->Location;
         }
 
         void InitializeGame() {
@@ -88,7 +100,7 @@ namespace JuegoFinal {
             bmpFondo = gcnew Bitmap("Assets/Background/fondo1.png");
 
             controller = new Controller(gameState->selectedHero, bmpHero1, bmpHero2);
-            controller->setLevel(1); // Nivel 1 Ciudad
+            controller->setLevel(1);
             controller->setInitialSpawn(100, 300);
             controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
 
@@ -131,6 +143,14 @@ namespace JuegoFinal {
 
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
+
+            // DIBUJAR COORDENADAS PARA EDITAR
+            System::Drawing::Font^ fontDebug = gcnew System::Drawing::Font("Consolas", 14, FontStyle::Bold);
+            SolidBrush^ brushDebug = gcnew SolidBrush(Color::Yellow);
+            String^ coordText = "X: " + mousePos.X + " Y: " + mousePos.Y;
+            buffer->Graphics->DrawString(coordText, fontDebug, brushDebug, mousePos.X + 15, mousePos.Y + 15);
+            delete fontDebug; delete brushDebug;
+
             controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
             buffer->Render(g);
 
