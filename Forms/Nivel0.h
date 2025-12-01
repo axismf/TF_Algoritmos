@@ -94,7 +94,7 @@ namespace JuegoFinal {
             collisionMap->cargarMapaNivel1();
 
             controller = new Controller(gameState->selectedHero, bmpHero1, bmpHero2);
-            controller->setLevel(0); // ID 0 para Tutorial
+            controller->setLevel(0); // IMPORTANTE: Nivel 0
             controller->setInitialSpawn(500, 400);
             controller->spawnPortal(60, 290);
             controller->setPortalVisible(false);
@@ -126,4 +126,63 @@ namespace JuegoFinal {
 
             if (timeRemaining <= 0) {
                 timer->Enabled = false;
-                MessageBox::Show("¡SE ACABÓ EL TIEMPO!", "GAME OVER",
+                MessageBox::Show("¡SE ACABÓ EL TIEMPO!", "GAME OVER", MessageBoxButtons::OK, MessageBoxIcon::Error);
+                this->Close();
+                return;
+            }
+
+            controller->moveEverything(buffer->Graphics);
+            controller->collision();
+
+            int vidas = controller->getVidasHero();
+            lbVidas->Text = "Vidas: " + vidas.ToString();
+            if (vidas <= 2) lbVidas->ForeColor = Color::Red; else if (vidas <= 4) lbVidas->ForeColor = Color::Orange; else lbVidas->ForeColor = Color::LimeGreen;
+
+            buffer->Graphics->Clear(Color::Black);
+            buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
+            DibujarInstrucciones();
+            controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
+            buffer->Render(g);
+
+            if (portalSpawned && controller->checkPortalCollision()) {
+                timer->Enabled = false;
+                MostrarPantallaTransicion();
+                return;
+            }
+
+            if (controller->getVidasHero() <= 0) { timer->Enabled = false; this->Close(); }
+        }
+
+        void DibujarInstrucciones() {
+            System::Drawing::Font^ font = gcnew System::Drawing::Font("Arial", 16, FontStyle::Bold);
+            SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(200, 255, 255, 255));
+            buffer->Graphics->DrawString("CONTROLES:\nW, A, S, D", font, brush, 50, 50);
+            delete font; delete brush;
+        }
+
+        void MostrarPantallaTransicion() {
+            gameState->addScore(100);
+            MessageBox::Show("¡LO ENCONTRASTE!\nPreparate para el NIVEL 1...", "¡Excelente!", MessageBoxButtons::OK, MessageBoxIcon::Information);
+            gameState->nextLevel();
+            this->Hide();
+            Nivel1^ nivel1 = gcnew Nivel1();
+            nivel1->ShowDialog();
+            delete nivel1;
+            this->Close();
+        }
+
+        void Nivel0_KeyDown(Object^ sender, KeyEventArgs^ e) {
+            Rectangle heroRect = controller->getHeroRectangle();
+            int posXAnterior = heroRect.X; int posYAnterior = heroRect.Y;
+            switch (e->KeyCode) {
+            case Keys::A: controller->moveHero(buffer->Graphics, 'A'); break;
+            case Keys::D: controller->moveHero(buffer->Graphics, 'D'); break;
+            case Keys::W: controller->moveHero(buffer->Graphics, 'W'); break;
+            case Keys::S: controller->moveHero(buffer->Graphics, 'S'); break;
+            case Keys::Escape: timer->Enabled = false; if (MessageBox::Show("¿Salir?", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) this->Close(); else timer->Enabled = true; return;
+            }
+            Rectangle newRect = controller->getHeroRectangle();
+            if (collisionMap->hayColision(newRect.X, newRect.Y, newRect.Width, newRect.Height)) controller->setHeroPosition(posXAnterior, posYAnterior);
+        }
+    };
+}

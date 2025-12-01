@@ -19,13 +19,7 @@ namespace JuegoFinal {
         Bitmap^ bmpEnemy1; Bitmap^ bmpEnemy2; Bitmap^ bmpEnemy3;
         Bitmap^ bmpFondo;
         Controller* controller;
-
-        // Labels UI
         Label^ lbVidas; Label^ lbTiempo; Label^ lbPuntos; Label^ lbObjetivo; Label^ lbNivel;
-
-        // --- NUEVO LABEL DE COORDENADAS ---
-        Label^ lbCoordenadas;
-
         Panel^ panelJuego; Panel^ panelHUD;
         Timer^ timer;
         int timeRemaining; int frameCount; int requiredTime;
@@ -65,36 +59,16 @@ namespace JuegoFinal {
             lbPuntos = gcnew Label(); lbPuntos->Text = L"⭐ Puntos: 0"; lbPuntos->Font = gcnew Drawing::Font("Arial", 14); lbPuntos->ForeColor = Color::Gold; lbPuntos->Location = Point(750, 28); lbPuntos->AutoSize = true; panelHUD->Controls->Add(lbPuntos);
             lbObjetivo = gcnew Label(); lbObjetivo->Text = L"🎯 Sobrevive 30 segundos"; lbObjetivo->Font = gcnew Drawing::Font("Arial", 12); lbObjetivo->ForeColor = Color::LightGreen; lbObjetivo->Location = Point(950, 30); lbObjetivo->AutoSize = true; panelHUD->Controls->Add(lbObjetivo);
 
-            // --- CONFIGURACIÓN LABEL COORDENADAS ---
-            lbCoordenadas = gcnew Label();
-            lbCoordenadas->Text = L"X: 0 Y: 0";
-            lbCoordenadas->Font = gcnew Drawing::Font("Consolas", 12, FontStyle::Bold); // Fuente monoespaciada para leer mejor
-            lbCoordenadas->ForeColor = Color::White;
-            lbCoordenadas->BackColor = Color::Black;
-            lbCoordenadas->Location = Point(1050, 5); // Arriba a la derecha
-            lbCoordenadas->AutoSize = true;
-            panelHUD->Controls->Add(lbCoordenadas);
-
             panelJuego = gcnew Panel();
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
-
-            // --- EVENTO PARA CAPTURAR COORDENADAS DEL MOUSE ---
-            this->panelJuego->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &Nivel1::panelJuego_MouseMove);
-
             this->Controls->Add(panelJuego);
 
             timer = gcnew Timer(this->components);
-            timer->Interval = 16;
+            timer->Interval = 16; // 60 FPS
             timer->Tick += gcnew EventHandler(this, &Nivel1::timer_Tick);
             this->ResumeLayout(false);
-        }
-
-        // --- MÉTODO PARA ACTUALIZAR EL LABEL DE COORDENADAS ---
-        void panelJuego_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-            // Muestra las coordenadas relativas al panel de juego (lo que necesitas para spawn)
-            lbCoordenadas->Text = "X: " + e->X + " Y: " + e->Y;
         }
 
         void InitializeGame() {
@@ -114,7 +88,7 @@ namespace JuegoFinal {
             bmpFondo = gcnew Bitmap("Assets/Background/fondo1.png");
 
             controller = new Controller(gameState->selectedHero, bmpHero1, bmpHero2);
-            controller->setLevel(1); // Nivel Ciudad
+            controller->setLevel(1); // Nivel 1 Ciudad
             controller->setInitialSpawn(100, 300);
             controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
 

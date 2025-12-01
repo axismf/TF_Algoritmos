@@ -23,7 +23,7 @@ private:
 	int selectedHero;
 	bool portalSpawned;
 	int invulnerabilityFrames;
-	int levelId; // 0 = Tutorial, 1 = Ciudad
+	int levelId;
 
 public:
 	Controller(int sh, Bitmap^ bmpHero1, Bitmap^ bmpHero2) {
@@ -49,35 +49,43 @@ public:
 		levelId = id;
 	}
 
-	// --- LÓGICA DE SPAWN (COORDENADAS REALES) ---
-	Point getValidSpawnPoint() {
-		int x, y;
+	// Helper para obtener una zona aleatoria válida y configurarla en el enemigo
+	void setupEnemyInZone(Character* enemy) {
+		int zX, zY, zW, zH; // Variables para la zona (X, Y, Ancho, Alto)
 
 		if (levelId == 0) {
 			// Nivel 0: Habitación
-			x = rand() % 900 + 150;
-			y = rand() % 400 + 150;
+			zX = 150; zY = 150; zW = 900; zH = 400;
 		}
 		else {
 			// Nivel 1: Ciudad
 			int zona = rand() % 3;
 			switch (zona) {
 			case 0: // Parking
-				x = rand() % 300 + 50;
-				y = rand() % 250 + 150;
+				zX = 50; zY = 150; zW = 300; zH = 250;
 				break;
 			case 1: // Avenida
-				x = rand() % 140 + 480;
-				y = rand() % 600 + 50;
+				zX = 480; zY = 50; zW = 140; zH = 600;
 				break;
-			case 2: // Derecha
-				x = rand() % 400 + 700;
-				y = rand() % 150 + 450;
+			case 2: // Vereda Derecha
+				zX = 700; zY = 450; zW = 400; zH = 150;
 				break;
-			default: x = 100; y = 100; break;
+			default: zX = 0; zY = 0; zW = 100; zH = 100; break;
 			}
 		}
-		return Point(x, y);
+
+		// 1. Configurar los límites para que no salga
+		enemy->setBounds(zX, zY, zW, zH);
+
+		// 2. Calcular posición inicial aleatoria DENTRO de esos límites
+		int randomX = zX + rand() % zW;
+		int randomY = zY + rand() % zH;
+
+		// Ajuste fino para asegurar que el sprite no nazca pegado al borde derecho/inferior
+		if (randomX + 30 > zX + zW) randomX = zX + zW - 30;
+		if (randomY + 40 > zY + zH) randomY = zY + zH - 40;
+
+		enemy->setPosition(randomX, randomY);
 	}
 
 	void createEnemies(Bitmap^ bmpEnemy1, Bitmap^ bmpEnemy2, Bitmap^ bmpEnemy3) {
@@ -85,23 +93,22 @@ public:
 		int count = rand() % 3 + 3;
 
 		for (int i = 0; i < count; i++) {
+			// Creamos el enemigo y llamamos al helper para configurarlo
 			Enemy1* e1 = new Enemy1(bmpEnemy1->Width / 4, bmpEnemy1->Height / 4);
-			Point p1 = getValidSpawnPoint();
-			e1->setPosition(p1.X, p1.Y);
+			setupEnemyInZone(e1);
 			enemies1.push_back(e1);
 
 			Enemy2* e2 = new Enemy2(bmpEnemy2->Width / 4, bmpEnemy2->Height / 4);
-			Point p2 = getValidSpawnPoint();
-			e2->setPosition(p2.X, p2.Y);
+			setupEnemyInZone(e2);
 			enemies2.push_back(e2);
 
 			Enemy3* e3 = new Enemy3(bmpEnemy3->Width / 4, bmpEnemy3->Height / 4);
-			Point p3 = getValidSpawnPoint();
-			e3->setPosition(p3.X, p3.Y);
+			setupEnemyInZone(e3);
 			enemies3.push_back(e3);
 		}
 	}
 
+	// ... Resto de métodos iguales ...
 	void spawnPortal(int x, int y) {
 		if (portal == nullptr) {
 			portal = new Portal(x, y);
@@ -122,44 +129,25 @@ public:
 
 	bool isPortalSpawned() { return portalSpawned; }
 
-	// --- NUEVO MÉTODO PARA DIBUJAR ZONAS (SOLICITADO) ---
-	void drawSpawnZones(Graphics^ g) {
-		// Pinceles temporales para debug
-		SolidBrush^ debugBrush = gcnew SolidBrush(Color::FromArgb(60, 0, 255, 0)); // Verde translúcido
-		Pen^ debugPen = gcnew Pen(Color::Lime, 2);
-
-		if (levelId == 0) {
-			// Nivel 0
-			g->FillRectangle(debugBrush, 150, 150, 900, 400);
-			g->DrawRectangle(debugPen, 150, 150, 900, 400);
-			g->DrawString("ZONA SPAWN N0", gcnew System::Drawing::Font("Arial", 10), Brushes::Lime, 150, 130);
-		}
-		else {
-			// Nivel 1 (Ciudad)
-			// Zona A (Parking)
-			g->FillRectangle(debugBrush, 50, 150, 300, 250);
-			g->DrawRectangle(debugPen, 50, 150, 300, 250);
-			g->DrawString("Parking", gcnew System::Drawing::Font("Arial", 10), Brushes::Lime, 50, 130);
-
-			// Zona B (Avenida)
-			g->FillRectangle(debugBrush, 480, 50, 140, 600);
-			g->DrawRectangle(debugPen, 480, 50, 140, 600);
-			g->DrawString("Calle", gcnew System::Drawing::Font("Arial", 10), Brushes::Lime, 480, 30);
-
-			// Zona C (Derecha)
-			g->FillRectangle(debugBrush, 700, 450, 400, 150);
-			g->DrawRectangle(debugPen, 700, 450, 400, 150);
-			g->DrawString("Vereda", gcnew System::Drawing::Font("Arial", 10), Brushes::Lime, 700, 430);
-		}
-
-		delete debugBrush;
-		delete debugPen;
-	}
-
 	void drawEverything(Graphics^ g, Bitmap^ bmpHero1, Bitmap^ bmpHero2, Bitmap^ bmpEnemy1, Bitmap^ bmpEnemy2, Bitmap^ bmpEnemy3) {
 
-		// LLAMADA AL MÉTODO DE DIBUJADO DE ZONAS
-		drawSpawnZones(g);
+		// DIBUJO DE ZONAS (VERDE)
+		SolidBrush^ spawnBrush = gcnew SolidBrush(Color::FromArgb(60, 0, 255, 0));
+		Pen^ spawnPen = gcnew Pen(Color::Lime, 2);
+
+		if (levelId == 0) {
+			g->FillRectangle(spawnBrush, 150, 150, 900, 400);
+			g->DrawRectangle(spawnPen, 150, 150, 900, 400);
+		}
+		else {
+			g->FillRectangle(spawnBrush, 50, 150, 300, 250); // A
+			g->DrawRectangle(spawnPen, 50, 150, 300, 250);
+			g->FillRectangle(spawnBrush, 480, 50, 140, 600); // B
+			g->DrawRectangle(spawnPen, 480, 50, 140, 600);
+			g->FillRectangle(spawnBrush, 700, 450, 400, 150); // C
+			g->DrawRectangle(spawnPen, 700, 450, 400, 150);
+		}
+		delete spawnBrush; delete spawnPen;
 
 		if (portal != nullptr) portal->draw(g);
 
@@ -204,25 +192,23 @@ public:
 
 	void collision() {
 		if (invulnerabilityFrames > 0) return;
+		Character* hero = (selectedHero == 1) ? (Character*)hero1 : (Character*)hero2;
 
-		auto check = [&](Character* h) {
-			bool hit = false;
-			for (auto e : enemies1) if (h->getRectangle().IntersectsWith(e->getRectangle())) { hit = true; if (e->getType() == 0) e->changeDx(); else e->changeDy(); }
-			for (auto e : enemies2) if (h->getRectangle().IntersectsWith(e->getRectangle())) { hit = true; if (e->getType() == 0) e->changeDx(); else e->changeDy(); }
-			for (auto e : enemies3) if (h->getRectangle().IntersectsWith(e->getRectangle())) { hit = true; if (e->getType() == 0) e->changeDx(); else e->changeDy(); }
+		bool hit = false;
+		for (auto e : enemies1) if (hero->getRectangle().IntersectsWith(e->getRectangle())) { hit = true; if (e->getType() == 0) e->changeDx(); else e->changeDy(); }
+		for (auto e : enemies2) if (hero->getRectangle().IntersectsWith(e->getRectangle())) { hit = true; if (e->getType() == 0) e->changeDx(); else e->changeDy(); }
+		for (auto e : enemies3) if (hero->getRectangle().IntersectsWith(e->getRectangle())) { hit = true; if (e->getType() == 0) e->changeDx(); else e->changeDy(); }
 
-			if (hit) {
-				if (selectedHero == 1) hero1->quitarVida(); else hero2->quitarVida();
-				invulnerabilityFrames = 120;
-			}
-			};
-
-		if (selectedHero == 1) check(hero1); else check(hero2);
+		if (hit) {
+			if (selectedHero == 1) hero1->quitarVida(); else hero2->quitarVida();
+			invulnerabilityFrames = 120;
+		}
 	}
 
 	bool checkPortalCollision() {
 		if (portal == nullptr || !portal->getIsActive()) return false;
-		return getHeroRectangle().IntersectsWith(portal->getRectangle());
+		Character* hero = (selectedHero == 1) ? (Character*)hero1 : (Character*)hero2;
+		return hero->getRectangle().IntersectsWith(portal->getRectangle());
 	}
 
 	Rectangle getHeroRectangle() {
