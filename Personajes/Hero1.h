@@ -3,14 +3,14 @@
 
 class Hero1 : public Character {
 private:
-
 	int vidas;
+
 public:
 	Hero1(int width, int height) : Character(width, height) {
-		x = 0;
-		y = 50;
-		dx = dy = 15;  // ⬅️ MÁS RÁPIDO (era 10)
-		vidas = 5;     // ⬅️ FIJO, 5 vidas (era random)
+		x = 460;
+		y = 320;
+		dx = dy = 10;
+		vidas = 5;
 	}
 
 	~Hero1() {}
@@ -24,8 +24,7 @@ public:
 			}
 			break;
 		case 'D':
-
-			if (x + width * 1.0 < g->VisibleClipBounds.Width) {
+			if (x + width * 0.4 < g->VisibleClipBounds.Width) {
 				x += dx;
 				idy = 2;
 			}
@@ -37,8 +36,7 @@ public:
 			}
 			break;
 		case 'S':
-
-			if (y + height * 1.0 < g->VisibleClipBounds.Height) {
+			if (y + height * 0.4 < g->VisibleClipBounds.Height) {
 				y += dy;
 				idy = 0;
 			}
@@ -52,5 +50,10 @@ public:
 
 	void quitarVida() {
 		vidas--;
+	}
+
+	void setPosition(int newX, int newY) {
+		x = newX;
+		y = newY;
 	}
 };

@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 #include "../Controladores/Controller.h"
 #include "../Controladores/GameStateManager.h"
-#include "Nivel2.h"
+#include "../Personajes/CollisionMap.h"
+#include "Nivel1.h"
 
 namespace JuegoFinal {
 
@@ -9,7 +10,7 @@ namespace JuegoFinal {
     using namespace System::Windows::Forms;
     using namespace System::Drawing;
 
-    public ref class Nivel1 : public Form
+    public ref class Nivel0 : public Form
     {
     private:
         Graphics^ g;
@@ -24,34 +25,39 @@ namespace JuegoFinal {
         Bitmap^ bmpFondo;
 
         Controller* controller;
+        CollisionMap* collisionMap;
 
-        // UI Labels
         Label^ lbVidas;
         Label^ lbTiempo;
         Label^ lbPuntos;
         Label^ lbObjetivo;
         Label^ lbNivel;
+        Label^ lbInstrucciones;
+        Label^ lbCoordMouse; // Para ver coordenadas
         Panel^ panelJuego;
         Panel^ panelHUD;
         Timer^ timer;
 
         int timeRemaining;
         int frameCount;
-        int requiredTime; // Tiempo requerido para spawn del portal
+        int requiredTime;
         bool portalSpawned;
         GameStateManager^ gameState;
 
     public:
-        Nivel1(void)
+        Nivel0(void)
         {
             InitializeComponent();
             InitializeGame();
         }
 
-        ~Nivel1()
+        ~Nivel0()
         {
             if (controller != nullptr) {
                 delete controller;
+            }
+            if (collisionMap != nullptr) {
+                delete collisionMap;
             }
             if (components != nullptr) {
                 delete components;
@@ -66,79 +72,83 @@ namespace JuegoFinal {
             this->components = gcnew System::ComponentModel::Container();
             this->SuspendLayout();
 
-            // Configuración de la ventana
-            this->Text = L"Nivel 1 - Dimensión del Caos";
+            this->Text = L"TUTORIAL - Aprende a Jugar";
             this->ClientSize = System::Drawing::Size(1200, 700);
             this->StartPosition = FormStartPosition::CenterScreen;
             this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
             this->MaximizeBox = false;
             this->BackColor = Color::Black;
             this->KeyPreview = true;
-            this->KeyDown += gcnew KeyEventHandler(this, &Nivel1::Nivel1_KeyDown);
+            this->KeyDown += gcnew KeyEventHandler(this, &Nivel0::Nivel0_KeyDown);
 
-            // Panel HUD (arriba)
+            // Panel HUD
             panelHUD = gcnew Panel();
             panelHUD->Location = Point(0, 0);
             panelHUD->Size = Drawing::Size(1200, 80);
-            panelHUD->BackColor = Color::FromArgb(30, 30, 40);
+            panelHUD->BackColor = Color::FromArgb(20, 40, 20);
             this->Controls->Add(panelHUD);
 
-            // Label Nivel
             lbNivel = gcnew Label();
-            lbNivel->Text = L"NIVEL 1";
+            lbNivel->Text = L"TUTORIAL";
             lbNivel->Font = gcnew Drawing::Font("Arial", 18.0f, FontStyle::Bold);
-            lbNivel->ForeColor = Color::Cyan;
+            lbNivel->ForeColor = Color::LimeGreen;
             lbNivel->AutoSize = true;
             lbNivel->Location = Point(20, 25);
             panelHUD->Controls->Add(lbNivel);
 
-            // Label Vidas
             lbVidas = gcnew Label();
-            lbVidas->Text = L"❤️ Vidas: 5";
+            lbVidas->Text = L"Vidas: 5";
             lbVidas->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbVidas->ForeColor = Color::Red;
             lbVidas->AutoSize = true;
             lbVidas->Location = Point(250, 28);
             panelHUD->Controls->Add(lbVidas);
 
-            // Label Tiempo
             lbTiempo = gcnew Label();
-            lbTiempo->Text = L"⏱️ Tiempo: 60s";
+            lbTiempo->Text = L"Tiempo: 30s";
             lbTiempo->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbTiempo->ForeColor = Color::Yellow;
             lbTiempo->AutoSize = true;
             lbTiempo->Location = Point(480, 28);
             panelHUD->Controls->Add(lbTiempo);
 
-            // Label Puntos
             lbPuntos = gcnew Label();
-            lbPuntos->Text = L"⭐ Puntos: 0";
+            lbPuntos->Text = L"Puntos: 0";
             lbPuntos->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbPuntos->ForeColor = Color::Gold;
             lbPuntos->AutoSize = true;
             lbPuntos->Location = Point(750, 28);
             panelHUD->Controls->Add(lbPuntos);
 
-            // Label Objetivo
             lbObjetivo = gcnew Label();
-            lbObjetivo->Text = L"🎯 Sobrevive 30 segundos";
+            lbObjetivo->Text = L"Practica moverte con WASD";
             lbObjetivo->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
             lbObjetivo->ForeColor = Color::LightGreen;
             lbObjetivo->AutoSize = true;
             lbObjetivo->Location = Point(950, 30);
             panelHUD->Controls->Add(lbObjetivo);
 
-            // Panel de juego (debajo del HUD)
+            // Label para coordenadas del mouse
+            lbCoordMouse = gcnew Label();
+            lbCoordMouse->Text = L"Mouse: (0, 0)";
+            lbCoordMouse->Font = gcnew Drawing::Font("Arial", 11.0f, FontStyle::Bold);
+            lbCoordMouse->ForeColor = Color::Cyan;
+            lbCoordMouse->AutoSize = true;
+            lbCoordMouse->Location = Point(20, 5);
+            panelHUD->Controls->Add(lbCoordMouse);
+
+            // Panel de juego
             panelJuego = gcnew Panel();
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
+            panelJuego->MouseMove += gcnew MouseEventHandler(this, &Nivel0::panelJuego_MouseMove);
             this->Controls->Add(panelJuego);
 
             // Timer
             timer = gcnew Timer(this->components);
-            timer->Interval = 16; // ~60 FPS
-            timer->Tick += gcnew EventHandler(this, &Nivel1::timer_Tick);
+            timer->Interval = 16;
+            timer->Tick += gcnew EventHandler(this, &Nivel0::timer_Tick);
 
             this->ResumeLayout(false);
         }
@@ -146,8 +156,8 @@ namespace JuegoFinal {
         void InitializeGame()
         {
             gameState = GameStateManager::getInstance();
-            timeRemaining = 60;
-            requiredTime = 30; // Sobrevivir 30 segundos para que aparezca el portal
+            timeRemaining = 30;
+            requiredTime = 0; // Sin requisito de tiempo
             frameCount = 0;
             portalSpawned = false;
 
@@ -155,7 +165,6 @@ namespace JuegoFinal {
             space = BufferedGraphicsManager::Current;
             buffer = space->Allocate(g, panelJuego->ClientRectangle);
 
-            // Cargar sprites
             bmpHero1 = gcnew Bitmap("Assets/Sprites/prota.png");
             bmpHero1->MakeTransparent(bmpHero1->GetPixel(0, 0));
 
@@ -171,12 +180,26 @@ namespace JuegoFinal {
             bmpEnemy3 = gcnew Bitmap("Assets/Sprites/roboto.png");
             bmpEnemy3->MakeTransparent(bmpEnemy3->GetPixel(0, 0));
 
-            bmpFondo = gcnew Bitmap("Assets/Background/fondo1.png");
+            bmpFondo = gcnew Bitmap("Assets/Background/fondo0.png");
+
+            // Crear mapa de colisiones
+            collisionMap = new CollisionMap();
+            collisionMap->cargarMapaTutorial();
 
             int selectedHero = gameState->selectedHero;
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
-            controller->setInitialSpawn(100, 300); // Spawn Nivel 1
-            controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
+            
+            // Establecer spawn inicial del tutorial
+            controller->setInitialSpawn(500, 400);
+            
+            // NO crear enemigos en el tutorial
+            // controller->createEnemies(bmpEnemy1, bmpEnemy1, bmpEnemy1);
+
+            // Activar portal/puerta inmediatamente
+            controller->spawnPortal(60, 290);
+            portalSpawned = true;
+            lbObjetivo->Text = "Ve a la PUERTA para comenzar";
+            lbObjetivo->ForeColor = Color::LimeGreen;
 
             timer->Enabled = true;
         }
@@ -185,33 +208,22 @@ namespace JuegoFinal {
         {
             frameCount++;
 
-            // Actualizar tiempo cada segundo (60 frames)
             if (frameCount % 60 == 0 && timeRemaining > 0) {
                 timeRemaining--;
-                lbTiempo->Text = "⏱️ Tiempo: " + timeRemaining.ToString() + "s";
+                lbTiempo->Text = "Tiempo: " + timeRemaining.ToString() + "s";
+                
+                gameState->addScore(5);
+                lbPuntos->Text = "Puntos: " + gameState->score.ToString();
 
-                // Agregar puntos por sobrevivir
-                gameState->addScore(10);
-                lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();
-
-                // Verificar si es momento de spawn del portal
-                if (timeRemaining <= requiredTime && !portalSpawned) {
-                    controller->spawnPortalCentro(panelJuego->Width, panelJuego->Height);
-                    portalSpawned = true;
-                    lbObjetivo->Text = "🌀 ¡PORTAL ABIERTO! Entra para avanzar";
-                    lbObjetivo->ForeColor = Color::Magenta;
-                }
+                // No hay requisito de tiempo, el portal ya est� abierto
             }
 
-            // Mover enemigos y héroe
             controller->moveEverything(buffer->Graphics);
             controller->collision();
 
-            // Actualizar vidas
             int vidas = controller->getVidasHero();
-            lbVidas->Text = "❤️ Vidas: " + vidas.ToString();
+            lbVidas->Text = "Vidas: " + vidas.ToString();
 
-            // Cambiar color de vidas según cantidad
             if (vidas <= 2) {
                 lbVidas->ForeColor = Color::Red;
             }
@@ -222,75 +234,93 @@ namespace JuegoFinal {
                 lbVidas->ForeColor = Color::LimeGreen;
             }
 
-            // Dibujar todo
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
-
+            
+            // Dibujar muros transl�cidos (para debug y ajuste)
+            collisionMap->dibujarMuros(buffer->Graphics);
+            
+            // Dibujar instrucciones en pantalla
+            DibujarInstrucciones();
+            
             controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2,
                 bmpEnemy1, bmpEnemy2, bmpEnemy3);
-
+            
             buffer->Render(g);
 
-            // Verificar colisión con portal
             if (portalSpawned && controller->checkPortalCollision()) {
                 timer->Enabled = false;
                 MostrarPantallaTransicion();
                 return;
             }
 
-            // Verificar victoria (tiempo completo)
-            if (timeRemaining <= 0 && controller->getVidasHero() > 0) {
-                if (!portalSpawned) {
-                    controller->spawnPortalCentro(panelJuego->Width, panelJuego->Height);
-                    portalSpawned = true;
-                    lbObjetivo->Text = "🌀 ¡PORTAL ABIERTO! Entra para avanzar";
-                    lbObjetivo->ForeColor = Color::Magenta;
-                }
-            }
-
-            // Verificar derrota (sin vidas)
+            // No hay game over por tiempo en el tutorial
             if (controller->getVidasHero() <= 0) {
+                // No deber�a pasar en el tutorial sin enemigos
                 timer->Enabled = false;
-                MessageBox::Show(
-                    "GAME OVER!\n\n" +
-                    "Puntuación Final: " + gameState->score.ToString() + "\n" +
-                    "Tiempo Sobrevivido: " + (60 - timeRemaining).ToString() + " segundos",
-                    "Derrota",
-                    MessageBoxButtons::OK,
-                    MessageBoxIcon::Error
-                );
                 this->Close();
             }
         }
 
-        void MostrarPantallaTransicion() {
-            // Bonus por completar nivel
-            gameState->addScore(500);
+        void DibujarInstrucciones()
+        {
+            System::Drawing::Font^ font = gcnew System::Drawing::Font("Arial", 16.0f, FontStyle::Bold);
+            SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(200, 255, 255, 255));
+            
+            String^ texto = 
+                "CONTROLES:\n\n" +
+                "W - Arriba\n" +
+                "A - Izquierda\n" +
+                "S - Abajo\n" +
+                "D - Derecha\n\n" +
+                "ESC - Pausar";
+            
+            buffer->Graphics->DrawString(texto, font, brush, 50.0f, 50.0f);
+            
+            delete font;
+            delete brush;
 
+            // Dibujar objetivo
+            System::Drawing::Font^ font2 = gcnew System::Drawing::Font("Arial", 14.0f, FontStyle::Bold);
+            SolidBrush^ brush2 = gcnew SolidBrush(Color::Yellow);
+            
+            String^ objetivo = "OBJETIVO: Practica moverte durante 15 segundos";
+            buffer->Graphics->DrawString(objetivo, font2, brush2, 350.0f, 500.0f);
+            
+            delete font2;
+            delete brush2;
+        }
+
+        void MostrarPantallaTransicion() {
+            gameState->addScore(100);
+            
             MessageBox::Show(
-                "¡NIVEL 1 COMPLETADO!\n\n" +
-                "🎉 Entraste al portal\n" +
-                "⭐ Puntuación: " + gameState->score.ToString() + "\n" +
-                "⏱️ Tiempo: " + (60 - timeRemaining).ToString() + "s\n\n" +
-                "Preparándote para el NIVEL 2...",
-                "¡Victoria!",
-                MessageBoxButtons::OK,
+                "TUTORIAL COMPLETADO!\n\n" +
+                "Ahora sabes como jugar.\n" +
+                "Puntuacion: " + gameState->score.ToString() + "\n\n" +
+                "Preparate para el NIVEL 1...",
+                "Listo para comenzar!", 
+                MessageBoxButtons::OK, 
                 MessageBoxIcon::Information
             );
-
-            // Avanzar al siguiente nivel
+            
             gameState->nextLevel();
-
-            // Abrir Nivel 2
+            
             this->Hide();
-            Nivel2^ nivel2 = gcnew Nivel2();
-            nivel2->ShowDialog();
-            delete nivel2;
+            Nivel1^ nivel1 = gcnew Nivel1();
+            nivel1->ShowDialog();
+            delete nivel1;
             this->Close();
         }
 
-        void Nivel1_KeyDown(Object^ sender, KeyEventArgs^ e)
+        void Nivel0_KeyDown(Object^ sender, KeyEventArgs^ e)
         {
+            // Guardar posici�n anterior
+            Rectangle heroRect = controller->getHeroRectangle();
+            int posXAnterior = heroRect.X;
+            int posYAnterior = heroRect.Y;
+
+            // Realizar movimiento
             switch (e->KeyCode) {
             case Keys::A:
                 controller->moveHero(buffer->Graphics, 'A');
@@ -307,18 +337,52 @@ namespace JuegoFinal {
             case Keys::Escape:
                 timer->Enabled = false;
                 if (MessageBox::Show(
-                    "¿Volver al menú?\n\nPerderás tu progreso actual",
+                    "Salir del tutorial?", 
                     "Pausa",
-                    MessageBoxButtons::YesNo,
-                    MessageBoxIcon::Question) == System::Windows::Forms::DialogResult::Yes)
+                    MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) 
                 {
                     this->Close();
                 }
                 else {
                     timer->Enabled = true;
                 }
-                break;
+                return;
+            default:
+                return;
             }
+
+            // Obtener nueva posici�n
+            Rectangle newRect = controller->getHeroRectangle();
+            int posX = newRect.X;
+            int posY = newRect.Y;
+            int ancho = newRect.Width;
+            int alto = newRect.Height;
+
+            // L�mites de pantalla
+            int anchoFrm = (int)buffer->Graphics->VisibleClipBounds.Width;
+            int altoFrm = (int)buffer->Graphics->VisibleClipBounds.Height;
+            
+            if (posX < 0) posX = 0;
+            if (posY < 0) posY = 0;
+            if (posX + ancho > anchoFrm)
+                posX = anchoFrm - ancho;
+            if (posY + alto > altoFrm)
+                posY = altoFrm - alto;
+
+            // Verificar colisi�n con paredes del mapa
+            if (collisionMap->hayColision(posX, posY, ancho, alto)) {
+                // Si hay colisi�n, revertir a posici�n anterior
+                posX = posXAnterior;
+                posY = posYAnterior;
+            }
+
+            // Aplicar posici�n final
+            controller->setHeroPosition(posX, posY);
+        }
+
+        void panelJuego_MouseMove(Object^ sender, MouseEventArgs^ e) {
+            // Mostrar coordenadas del mouse en tiempo real
+            lbCoordMouse->Text = "Mouse: (" + e->X + ", " + e->Y + ")";
         }
     };
 }

@@ -7,10 +7,10 @@ private:
 
 public:
 	Hero2(int width, int height) : Character(width, height) {
-		x = 0;
-		y = 50;
+		x = 100;
+		y = 300;
 		dx = dy = 10;
-		vidas = rand() % 7 + 2;
+		vidas = 8;
 	}
 
 	~Hero2() {}
@@ -24,8 +24,7 @@ public:
 			}
 			break;
 		case 'D':
-
-			if (x + width * 1.0 < g->VisibleClipBounds.Width) {
+			if (x + width * 0.4 < g->VisibleClipBounds.Width) {
 				x += dx;
 				idy = 2;
 			}
@@ -37,8 +36,7 @@ public:
 			}
 			break;
 		case 'S':
-
-			if (y + height * 1.0 < g->VisibleClipBounds.Height) {
+			if (y + height * 0.4 < g->VisibleClipBounds.Height) {
 				y += dy;
 				idy = 0;
 			}
@@ -52,5 +50,10 @@ public:
 
 	void quitarVida() {
 		vidas--;
+	}
+
+	void setPosition(int newX, int newY) {
+		x = newX;
+		y = newY;
 	}
 };

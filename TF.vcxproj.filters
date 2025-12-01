@@ -72,6 +72,12 @@
     <ClInclude Include="Forms\Nivel3.h">
       <Filter>Forms</Filter>
     </ClInclude>
+    <ClInclude Include="Forms\Nivel0.h">
+      <Filter>Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="Personajes\CollisionMap.h">
+      <Filter>Personajes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Sprites\IA.png">
@@ -102,6 +108,9 @@
       <Filter>Forms</Filter>
     </ClCompile>
     <ClCompile Include="Forms\Nivel3.cpp">
+      <Filter>Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\Nivel0.cpp">
       <Filter>Forms</Filter>
     </ClCompile>
   </ItemGroup>

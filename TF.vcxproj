@@ -119,6 +119,7 @@
     <ClInclude Include="Controladores\GameConfig.h" />
     <ClInclude Include="Controladores\GameStateManager.h" />
     <ClInclude Include="Forms\MenuPrincipal.h" />
+    <ClInclude Include="Forms\Nivel0.h" />
     <ClInclude Include="Forms\Nivel1.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -132,6 +133,7 @@
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Personajes\Character.h" />
+    <ClInclude Include="Personajes\CollisionMap.h" />
     <ClInclude Include="Personajes\Enemy1.h" />
     <ClInclude Include="Personajes\Enemy2.h" />
     <ClInclude Include="Personajes\Enemy3.h" />
@@ -166,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Forms\MenuPrincipal.cpp" />
+    <ClCompile Include="Forms\Nivel0.cpp" />
     <ClCompile Include="Forms\Nivel1.cpp" />
     <ClCompile Include="Forms\Nivel2.cpp" />
     <ClCompile Include="Forms\Nivel3.cpp" />

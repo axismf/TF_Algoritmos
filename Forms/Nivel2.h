@@ -164,6 +164,7 @@ namespace JuegoFinal {
 
             int selectedHero = gameState->selectedHero;
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
+            controller->setInitialSpawn(200, 200); // Spawn Nivel 2
             controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
 
             lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();

@@ -61,15 +61,18 @@ public:
 		}
 	}
 
-	void spawnPortal(int screenWidth, int screenHeight) {
+	void spawnPortal(int x, int y) {
 		if (portal == nullptr) {
-			// Spawn portal en el centro de la pantalla
-			int portalX = screenWidth / 2 - 40;
-			int portalY = screenHeight / 2 - 50;
-			portal = new Portal(portalX, portalY);
+			portal = new Portal(x, y);
 			portal->activate();
 			portalSpawned = true;
 		}
+	}
+
+	void spawnPortalCentro(int screenWidth, int screenHeight) {
+		int portalX = screenWidth / 2 - 40;
+		int portalY = screenHeight / 2 - 50;
+		spawnPortal(portalX, portalY);
 	}
 
 	bool isPortalSpawned() {
@@ -268,5 +271,27 @@ public:
 		else {
 			return hero2->getRectangle().IntersectsWith(portal->getRectangle());
 		}
+	}
+
+	Rectangle getHeroRectangle() {
+		if (selectedHero == 1) {
+			return hero1->getRectangle();
+		}
+		else {
+			return hero2->getRectangle();
+		}
+	}
+
+	void setHeroPosition(int x, int y) {
+		if (selectedHero == 1) {
+			hero1->setPosition(x, y);
+		}
+		else {
+			hero2->setPosition(x, y);
+		}
+	}
+
+	void setInitialSpawn(int x, int y) {
+		setHeroPosition(x, y);
 	}
 };

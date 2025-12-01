@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../Controladores/GameStateManager.h"
-#include "Nivel1.h"
+#include "Nivel0.h"
 
 namespace JuegoFinal {
 
@@ -240,9 +240,9 @@ namespace JuegoFinal {
             gameState->resetGame();
 
             this->Hide();
-            Nivel1^ nivel1 = gcnew Nivel1();
-            nivel1->ShowDialog();
-            delete nivel1;
+            Nivel0^ nivel0 = gcnew Nivel0();
+            nivel0->ShowDialog();
+            delete nivel0;
             this->Close();
         }
 
@@ -252,9 +252,9 @@ namespace JuegoFinal {
             gameState->resetGame();
 
             this->Hide();
-            Nivel1^ nivel1 = gcnew Nivel1();
-            nivel1->ShowDialog();
-            delete nivel1;
+            Nivel0^ nivel0 = gcnew Nivel0();
+            nivel0->ShowDialog();
+            delete nivel0;
             this->Close();
         }
 
