@@ -51,48 +51,34 @@ public:
         levelId = id;
     }
 
-    // AQUI ES DONDE EDITAS LA LOGICA DE APARICIÓN
     void setupEnemyInZone(Character* enemy) {
         int zX, zY, zW, zH;
 
         if (levelId == 0) {
-            // Tutorial
             zX = 150; zY = 150; zW = 900; zH = 400;
         }
         else if (levelId == 1) {
-            // Nivel 1: Ciudad (Zonas separadas)
-            int zona = rand() % 3;
-            switch (zona) {
-            case 0: // Parking (Izquierda)
-                zX = 65; zY = 10; zW =410; zH = 380;
-                break;
-            case 1: // Avenida (Centro)
+            int zona = rand() % 2;
+            if (zona == 0) {
+                zX = 65; zY = 10; zW = 410; zH = 380;
+            }
+            else {
                 zX = 540; zY = 50; zW = 260; zH = 480;
-               
-                break;
-            case 2: // Vereda (Derecha Abajo)
-                zX = 810; zY = 190; zW = 300; zH = 80;
-                break;
             }
         }
         else {
-            // Nivel 2 y 3 (Pantalla completa por defecto)
             zX = 50; zY = 50; zW = GameConfig::WINDOW_WIDTH - 100; zH = GameConfig::WINDOW_HEIGHT - 150;
         }
 
-        // LÍMITES
         enemy->setBounds(zX, zY, zW, zH);
 
-        // POSICIÓN ALEATORIA SEGURA (Corregido para que no se salgan)
-        int safeW = zW - 60; // Restamos tamaño del enemigo
+        int safeW = zW - 60;
         int safeH = zH - 60;
-
         if (safeW <= 0) safeW = 10;
         if (safeH <= 0) safeH = 10;
 
         int randomX = zX + (rand() % safeW);
         int randomY = zY + (rand() % safeH);
-
         enemy->setPosition(randomX, randomY);
     }
 
@@ -136,29 +122,6 @@ public:
     bool isPortalSpawned() { return portalSpawned; }
 
     void drawEverything(Graphics^ g, Bitmap^ bmpHero1, Bitmap^ bmpHero2, Bitmap^ bmpEnemy1, Bitmap^ bmpEnemy2, Bitmap^ bmpEnemy3) {
-
-        // AQUI DIBUJAS LAS ZONAS VISUALMENTE (COPIA LOS MISMOS NUMEROS QUE EN setupEnemyInZone)
-        SolidBrush^ spawnBrush = gcnew SolidBrush(Color::FromArgb(40, 0, 255, 0));
-        Pen^ spawnPen = gcnew Pen(Color::Lime, 2);
-
-        if (levelId == 0) {
-            g->FillRectangle(spawnBrush, 150, 150, 900, 400);
-            g->DrawRectangle(spawnPen, 150, 150, 900, 400);
-        }
-        else if (levelId == 1) {
-            // Parking
-            g->FillRectangle(spawnBrush, 50, 150, 300, 250);
-            g->DrawRectangle(spawnPen, 50, 150, 300, 250);
-
-            // Avenida
-            g->FillRectangle(spawnBrush, 540, 50, 260, 480);
-            g->DrawRectangle(spawnPen, 540, 50, 260, 480);
-
-            // Vereda
-            g->FillRectangle(spawnBrush, 700, 450, 400, 150);
-            g->DrawRectangle(spawnPen, 700, 450, 400, 150);
-        }
-        delete spawnBrush; delete spawnPen;
 
         if (portal != nullptr) portal->draw(g);
 

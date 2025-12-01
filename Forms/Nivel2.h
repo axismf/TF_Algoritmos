@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "../Controladores/Controller.h"
 #include "../Controladores/GameStateManager.h"
-#include "Nivel3.h"
+#include "../Personajes/CollisionMap.h"
 
 namespace JuegoFinal {
 
@@ -24,6 +24,7 @@ namespace JuegoFinal {
         Bitmap^ bmpFondo;
 
         Controller* controller;
+        CollisionMap* collisionMap;
 
         Label^ lbVidas;
         Label^ lbTiempo;
@@ -38,6 +39,8 @@ namespace JuegoFinal {
         int frameCount;
         int requiredTime;
         bool portalSpawned;
+        bool storyShown;
+        bool portalMessageShown;
         GameStateManager^ gameState;
 
     public:
@@ -49,12 +52,9 @@ namespace JuegoFinal {
 
         ~Nivel2()
         {
-            if (controller != nullptr) {
-                delete controller;
-            }
-            if (components != nullptr) {
-                delete components;
-            }
+            if (controller != nullptr) delete controller;
+            if (collisionMap != nullptr) delete collisionMap;
+            if (components != nullptr) delete components;
         }
 
     private:
@@ -65,7 +65,7 @@ namespace JuegoFinal {
             this->components = gcnew System::ComponentModel::Container();
             this->SuspendLayout();
 
-            this->Text = L"Nivel 2 - Dimensión Infernal";
+            this->Text = L"Nivel 2 - Dimensión del Pasado";
             this->ClientSize = System::Drawing::Size(1200, 700);
             this->StartPosition = FormStartPosition::CenterScreen;
             this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
@@ -81,7 +81,7 @@ namespace JuegoFinal {
             this->Controls->Add(panelHUD);
 
             lbNivel = gcnew Label();
-            lbNivel->Text = L"NIVEL 2";
+            lbNivel->Text = L"NIVEL 2 - FINAL";
             lbNivel->Font = gcnew Drawing::Font("Arial", 18.0f, FontStyle::Bold);
             lbNivel->ForeColor = Color::Red;
             lbNivel->AutoSize = true;
@@ -136,10 +136,12 @@ namespace JuegoFinal {
         void InitializeGame()
         {
             gameState = GameStateManager::getInstance();
-            timeRemaining = 90;  // Más tiempo en nivel 2
-            requiredTime = 45;   // Sobrevivir 45 segundos
+            timeRemaining = 90;
+            requiredTime = 45;
             frameCount = 0;
             portalSpawned = false;
+            storyShown = false;
+            portalMessageShown = false;
 
             g = panelJuego->CreateGraphics();
             space = BufferedGraphicsManager::Current;
@@ -160,11 +162,15 @@ namespace JuegoFinal {
             bmpEnemy3 = gcnew Bitmap("Assets/Sprites/roboto.png");
             bmpEnemy3->MakeTransparent(bmpEnemy3->GetPixel(0, 0));
 
-            bmpFondo = gcnew Bitmap("Assets/Background/fondo1.png");
+            bmpFondo = gcnew Bitmap("Assets/Background/fondo2.png");
+
+            collisionMap = new CollisionMap();
+            collisionMap->cargarMapaNivel2();
 
             int selectedHero = gameState->selectedHero;
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
-            controller->setInitialSpawn(200, 200); // Spawn Nivel 2
+            controller->setLevel(2);
+            controller->setInitialSpawn(200, 200);
             controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
 
             lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();
@@ -173,6 +179,18 @@ namespace JuegoFinal {
 
         void timer_Tick(Object^ sender, EventArgs^ e)
         {
+            if (!storyShown) {
+                buffer->Graphics->Clear(Color::Black);
+                buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
+                controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
+                buffer->Render(g);
+                timer->Enabled = false;
+                MessageBox::Show("Se ve como el pasado...", "Nivel 2", MessageBoxButtons::OK, MessageBoxIcon::Information);
+                storyShown = true;
+                timer->Enabled = true;
+                return;
+            }
+
             frameCount++;
 
             if (frameCount % 60 == 0 && timeRemaining > 0) {
@@ -183,10 +201,17 @@ namespace JuegoFinal {
                 lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();
 
                 if (timeRemaining <= requiredTime && !portalSpawned) {
-                    controller->spawnPortal(panelJuego->Width, panelJuego->Height);
+                    controller->spawnPortalCentro(panelJuego->Width, panelJuego->Height);
                     portalSpawned = true;
                     lbObjetivo->Text = "🌀 ¡PORTAL ABIERTO! Entra para avanzar";
                     lbObjetivo->ForeColor = Color::Magenta;
+
+                    if (!portalMessageShown) {
+                        portalMessageShown = true;
+                        timer->Enabled = false;
+                        MessageBox::Show("Otro portal...", "Nivel 2", MessageBoxButtons::OK, MessageBoxIcon::Information);
+                        timer->Enabled = true;
+                    }
                 }
             }
 
@@ -196,37 +221,26 @@ namespace JuegoFinal {
             int vidas = controller->getVidasHero();
             lbVidas->Text = "❤️ Vidas: " + vidas.ToString();
 
-            if (vidas <= 2) {
-                lbVidas->ForeColor = Color::Red;
-            }
-            else if (vidas <= 4) {
-                lbVidas->ForeColor = Color::Orange;
-            }
-            else {
-                lbVidas->ForeColor = Color::LimeGreen;
-            }
+            if (vidas <= 2) lbVidas->ForeColor = Color::Red;
+            else if (vidas <= 4) lbVidas->ForeColor = Color::Orange;
+            else lbVidas->ForeColor = Color::LimeGreen;
 
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
 
-            controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2,
-                bmpEnemy1, bmpEnemy2, bmpEnemy3);
+            controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
 
             buffer->Render(g);
 
             if (portalSpawned && controller->checkPortalCollision()) {
                 timer->Enabled = false;
-                MostrarPantallaTransicion();
+                MostrarPantallaVictoriaFinal();
                 return;
             }
 
-            if (timeRemaining <= 0 && controller->getVidasHero() > 0) {
-                if (!portalSpawned) {
-                    controller->spawnPortal(panelJuego->Width, panelJuego->Height);
-                    portalSpawned = true;
-                    lbObjetivo->Text = "🌀 ¡PORTAL ABIERTO! Entra para avanzar";
-                    lbObjetivo->ForeColor = Color::Magenta;
-                }
+            if (timeRemaining <= 0 && controller->getVidasHero() > 0 && !portalSpawned) {
+                controller->spawnPortalCentro(panelJuego->Width, panelJuego->Height);
+                portalSpawned = true;
             }
 
             if (controller->getVidasHero() <= 0) {
@@ -243,58 +257,58 @@ namespace JuegoFinal {
             }
         }
 
-        void MostrarPantallaTransicion() {
+        void MostrarPantallaVictoriaFinal() {
             gameState->addScore(1000);
 
+            MessageBox::Show("Continuará...", "Fin", MessageBoxButtons::OK, MessageBoxIcon::Information);
+
             MessageBox::Show(
-                "¡NIVEL 2 COMPLETADO!\n\n" +
-                "🎉 ¡Increíble!\n" +
-                "⭐ Puntuación: " + gameState->score.ToString() + "\n" +
-                "⏱️ Tiempo: " + (90 - timeRemaining).ToString() + "s\n\n" +
-                "Preparándote para el NIVEL 3 FINAL...",
-                "¡Victoria!",
+                "╔════════════════════════════════╗\n" +
+                "║     ¡JUEGO COMPLETADO!         ║\n" +
+                "╚════════════════════════════════╝\n\n" +
+                "🎉 ¡FELICIDADES! 🎉\n\n" +
+                "Has completado todos los niveles\n" +
+                "y escapado de las dimensiones!\n\n" +
+                "════════════════════════════\n" +
+                "📊 ESTADÍSTICAS FINALES:\n" +
+                "════════════════════════════\n\n" +
+                "⭐ Puntuación Total: " + gameState->score.ToString() + "\n" +
+                "🏆 Niveles Completados: 2/2\n" +
+                "⏱️ Tiempo Nivel 2: " + (90 - timeRemaining).ToString() + "s\n" +
+                "❤️ Vidas Restantes: " + controller->getVidasHero().ToString() + "\n\n" +
+                "════════════════════════════\n\n" +
+                "¡ERES UN VERDADERO HÉROE!",
+                "🏆 ¡VICTORIA TOTAL! 🏆",
                 MessageBoxButtons::OK,
                 MessageBoxIcon::Information
             );
 
-            gameState->nextLevel();
-
-            // Abrir Nivel 3
-            this->Hide();
-            Nivel3^ nivel3 = gcnew Nivel3();
-            nivel3->ShowDialog();
-            delete nivel3;
             this->Close();
         }
 
         void Nivel2_KeyDown(Object^ sender, KeyEventArgs^ e)
         {
+            Rectangle heroRect = controller->getHeroRectangle();
+            int posXAnterior = heroRect.X;
+            int posYAnterior = heroRect.Y;
+
             switch (e->KeyCode) {
-            case Keys::A:
-                controller->moveHero(buffer->Graphics, 'A');
-                break;
-            case Keys::D:
-                controller->moveHero(buffer->Graphics, 'D');
-                break;
-            case Keys::W:
-                controller->moveHero(buffer->Graphics, 'W');
-                break;
-            case Keys::S:
-                controller->moveHero(buffer->Graphics, 'S');
-                break;
+            case Keys::A: controller->moveHero(buffer->Graphics, 'A'); break;
+            case Keys::D: controller->moveHero(buffer->Graphics, 'D'); break;
+            case Keys::W: controller->moveHero(buffer->Graphics, 'W'); break;
+            case Keys::S: controller->moveHero(buffer->Graphics, 'S'); break;
             case Keys::Escape:
                 timer->Enabled = false;
-                if (MessageBox::Show(
-                    "¿Volver al menú?",
-                    "Pausa",
-                    MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes)
-                {
+                if (MessageBox::Show("¿Volver al menú?\n\n¡Estás en el NIVEL FINAL!", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes)
                     this->Close();
-                }
-                else {
+                else
                     timer->Enabled = true;
-                }
-                break;
+                return;
+            }
+
+            Rectangle newRect = controller->getHeroRectangle();
+            if (collisionMap->hayColision(newRect.X, newRect.Y, newRect.Width, newRect.Height)) {
+                controller->setHeroPosition(posXAnterior, posYAnterior);
             }
         }
     };

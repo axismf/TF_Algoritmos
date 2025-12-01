@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../Controladores/Controller.h"
 #include "../Controladores/GameStateManager.h"
+#include "../Personajes/CollisionMap.h"
 #include "Nivel2.h"
 
 namespace JuegoFinal {
@@ -19,20 +20,21 @@ namespace JuegoFinal {
         Bitmap^ bmpEnemy1; Bitmap^ bmpEnemy2; Bitmap^ bmpEnemy3;
         Bitmap^ bmpFondo;
         Controller* controller;
+        CollisionMap* collisionMap;
         Label^ lbVidas; Label^ lbTiempo; Label^ lbPuntos; Label^ lbObjetivo; Label^ lbNivel;
         Panel^ panelJuego; Panel^ panelHUD;
         Timer^ timer;
         int timeRemaining; int frameCount; int requiredTime;
-        bool portalSpawned; bool storyShown;
+        bool portalSpawned; bool storyShown; bool portalMessageShown;
         GameStateManager^ gameState;
 
-        // DEBUG: Coordenadas Mouse
         Point mousePos;
 
     public:
         Nivel1(void) { InitializeComponent(); InitializeGame(); }
         ~Nivel1() {
             if (controller != nullptr) delete controller;
+            if (collisionMap != nullptr) delete collisionMap;
             if (components != nullptr) delete components;
         }
 
@@ -66,10 +68,7 @@ namespace JuegoFinal {
             panelJuego->Location = Point(0, 80);
             panelJuego->Size = Drawing::Size(1200, 620);
             panelJuego->BackColor = Color::Black;
-
-            // CONECTAR EVENTO MOUSE
             this->panelJuego->MouseMove += gcnew MouseEventHandler(this, &Nivel1::Nivel1_MouseMove);
-
             this->Controls->Add(panelJuego);
 
             timer = gcnew Timer(this->components);
@@ -78,7 +77,6 @@ namespace JuegoFinal {
             this->ResumeLayout(false);
         }
 
-        // CAPTURAR MOUSE
         void Nivel1_MouseMove(Object^ sender, MouseEventArgs^ e) {
             mousePos = e->Location;
         }
@@ -86,7 +84,7 @@ namespace JuegoFinal {
         void InitializeGame() {
             gameState = GameStateManager::getInstance();
             timeRemaining = 60; requiredTime = 30; frameCount = 0;
-            portalSpawned = false; storyShown = false;
+            portalSpawned = false; storyShown = false; portalMessageShown = false;
 
             g = panelJuego->CreateGraphics();
             space = BufferedGraphicsManager::Current;
@@ -99,9 +97,12 @@ namespace JuegoFinal {
             bmpEnemy3 = gcnew Bitmap("Assets/Sprites/roboto.png"); bmpEnemy3->MakeTransparent(bmpEnemy3->GetPixel(0, 0));
             bmpFondo = gcnew Bitmap("Assets/Background/fondo1.png");
 
+            collisionMap = new CollisionMap();
+            collisionMap->cargarMapaNivel1();
+
             controller = new Controller(gameState->selectedHero, bmpHero1, bmpHero2);
             controller->setLevel(1);
-            controller->setInitialSpawn(100, 300);
+            controller->setInitialSpawn(50, 550);
             controller->createEnemies(bmpEnemy1, bmpEnemy2, bmpEnemy3);
 
             timer->Enabled = true;
@@ -127,10 +128,17 @@ namespace JuegoFinal {
                 lbPuntos->Text = "⭐ Puntos: " + gameState->score.ToString();
 
                 if (timeRemaining <= requiredTime && !portalSpawned) {
-                    controller->spawnPortalCentro(panelJuego->Width, panelJuego->Height);
+                    controller->spawnPortalCentro(800, 500);
                     portalSpawned = true;
                     lbObjetivo->Text = "🌀 ¡PORTAL ABIERTO! Entra para avanzar";
                     lbObjetivo->ForeColor = Color::Magenta;
+
+                    if (!portalMessageShown) {
+                        portalMessageShown = true;
+                        timer->Enabled = false;
+                        MessageBox::Show("Oh, un portal...", "Nivel 1", MessageBoxButtons::OK, MessageBoxIcon::Information);
+                        timer->Enabled = true;
+                    }
                 }
             }
 
@@ -143,13 +151,6 @@ namespace JuegoFinal {
 
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
-
-            // DIBUJAR COORDENADAS PARA EDITAR
-            System::Drawing::Font^ fontDebug = gcnew System::Drawing::Font("Consolas", 14, FontStyle::Bold);
-            SolidBrush^ brushDebug = gcnew SolidBrush(Color::Yellow);
-            String^ coordText = "X: " + mousePos.X + " Y: " + mousePos.Y;
-            buffer->Graphics->DrawString(coordText, fontDebug, brushDebug, mousePos.X + 15, mousePos.Y + 15);
-            delete fontDebug; delete brushDebug;
 
             controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2, bmpEnemy1, bmpEnemy2, bmpEnemy3);
             buffer->Render(g);
@@ -184,12 +185,21 @@ namespace JuegoFinal {
         }
 
         void Nivel1_KeyDown(Object^ sender, KeyEventArgs^ e) {
+            Rectangle heroRect = controller->getHeroRectangle();
+            int posXAnterior = heroRect.X;
+            int posYAnterior = heroRect.Y;
+
             switch (e->KeyCode) {
             case Keys::A: controller->moveHero(buffer->Graphics, 'A'); break;
             case Keys::D: controller->moveHero(buffer->Graphics, 'D'); break;
             case Keys::W: controller->moveHero(buffer->Graphics, 'W'); break;
             case Keys::S: controller->moveHero(buffer->Graphics, 'S'); break;
-            case Keys::Escape: timer->Enabled = false; if (MessageBox::Show("¿Volver al menú?", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) this->Close(); else timer->Enabled = true; break;
+            case Keys::Escape: timer->Enabled = false; if (MessageBox::Show("¿Volver al menú?", "Pausa", MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) this->Close(); else timer->Enabled = true; return;
+            }
+
+            Rectangle newRect = controller->getHeroRectangle();
+            if (collisionMap->hayColision(newRect.X, newRect.Y, newRect.Width, newRect.Height)) {
+                controller->setHeroPosition(posXAnterior, posYAnterior);
             }
         }
     };

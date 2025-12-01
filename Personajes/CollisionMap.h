@@ -30,20 +30,20 @@ public:
 
     bool hayColision(int x, int y, int ancho, int alto) {
         for (int i = 0; i < cantidadMuros; i++) {
-            // Verificar si los rectangulos se intersectan
+           
             if (x < murosX[i] + murosAncho[i] &&
                 x + ancho > murosX[i] &&
                 y < murosY[i] + murosAlto[i] &&
                 y + alto > murosY[i]) {
-                return true; // Hay colision
+                return true; 
             }
         }
-        return false; // No hay colision
+        return false; 
     }
 
     void dibujarMuros(Graphics^ g) {
-        // Brush translucido para ver las colisiones mientras ajustas
-    SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(100, 255, 0, 0)); // Rojo semi-transparente
+       
+    SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(100, 255, 0, 0)); 
     Pen^ pen = gcnew Pen(Color::Red, 2.0f);
 
     for (int i = 0; i < cantidadMuros; i++) {
@@ -55,22 +55,35 @@ public:
     delete pen;
 }
 
+    void cargarMapaNivel0() {
+        cantidadMuros = 0;
+
+        
+        agregarMuro(40, 215, 300, 160);          
+        agregarMuro(340, 212, 444, 44);          
+        agregarMuro(784, 213, 350, 110);        
+
+
+        agregarMuro(0, 448, 800, 30);        
+        agregarMuro(668, 413, 800, 30);        
+        agregarMuro(5, 378, 30, 100);          
+
+        agregarMuro(1151, 240, 30, 200);          
+    
+    }
+
     void cargarMapaNivel1() {
         cantidadMuros = 0;
 
-        // PAREDES EXTERIORES (bordes del mapa)
-        agregarMuro(40, 215, 300, 160);          // Arriba Izq
-        agregarMuro(340, 212, 444, 44);          // Arriba Centro
-        agregarMuro(784, 213, 350, 110);        // Arriba Derecha
+        agregarMuro(515, 66, 3, 440);
+        agregarMuro(0, 390, 540, 130);
+        agregarMuro(810, 290, 400, 240);
 
+    }
 
-        agregarMuro(0, 448, 800, 30);        // Abajo izq
-        agregarMuro(668, 413, 800, 30);        // Abajo der
-        agregarMuro(5, 378, 30, 100);           // Izquierda
+    void cargarMapaNivel2() {
+        cantidadMuros = 0;
 
-        agregarMuro(1151, 240, 30, 200);           // Der
        
-
-    
     }
 };

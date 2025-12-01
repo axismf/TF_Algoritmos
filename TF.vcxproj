@@ -126,9 +126,6 @@
     <ClInclude Include="Forms\Nivel2.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Forms\Nivel3.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
     <ClInclude Include="Forms\SelectCharacterForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -171,7 +168,6 @@
     <ClCompile Include="Forms\Nivel0.cpp" />
     <ClCompile Include="Forms\Nivel1.cpp" />
     <ClCompile Include="Forms\Nivel2.cpp" />
-    <ClCompile Include="Forms\Nivel3.cpp" />
     <ClCompile Include="Forms\SelectCharacterForm.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

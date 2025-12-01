@@ -69,9 +69,6 @@
     <ClInclude Include="Forms\Nivel2.h">
       <Filter>Forms</Filter>
     </ClInclude>
-    <ClInclude Include="Forms\Nivel3.h">
-      <Filter>Forms</Filter>
-    </ClInclude>
     <ClInclude Include="Forms\Nivel0.h">
       <Filter>Forms</Filter>
     </ClInclude>
@@ -105,9 +102,6 @@
       <Filter>Forms</Filter>
     </ClCompile>
     <ClCompile Include="Forms\Nivel2.cpp">
-      <Filter>Forms</Filter>
-    </ClCompile>
-    <ClCompile Include="Forms\Nivel3.cpp">
       <Filter>Forms</Filter>
     </ClCompile>
     <ClCompile Include="Forms\Nivel0.cpp">

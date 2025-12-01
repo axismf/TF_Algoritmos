@@ -8,7 +8,7 @@ private:
     int width, height;
     int animationFrame;
     bool isActive;
-    bool visible; // Nuevo atributo
+    bool visible; 
 
 public:
     Portal(int xPos, int yPos) {
@@ -18,7 +18,7 @@ public:
         height = 100;
         animationFrame = 0;
         isActive = false;
-        visible = true; // Visible por defecto
+        visible = true; 
     }
 
     ~Portal() {}
@@ -27,7 +27,7 @@ public:
         isActive = true;
     }
 
-    // Nuevo método para controlar visibilidad
+    
     void setVisible(bool v) {
         visible = v;
     }
@@ -37,18 +37,18 @@ public:
     }
 
     void draw(Graphics^ g) {
-        // Si no está activo O no es visible, no dibujar
+        
         if (!isActive || !visible) return;
 
-        // Animación del portal (efecto de rotación)
+       
         animationFrame++;
         if (animationFrame > 360) animationFrame = 0;
 
-        // Círculos concéntricos animados
+        
         int centerX = x + width / 2;
         int centerY = y + height / 2;
 
-        // Efecto de resplandor
+        
         for (int i = 3; i > 0; i--) {
             int radius = 30 + i * 10 + (animationFrame % 20);
             int alpha = 100 - (i * 30);
@@ -62,7 +62,7 @@ public:
             delete glowBrush;
         }
 
-        // Portal principal (anillo giratorio)
+      
         Pen^ portalPen = gcnew Pen(Color::MediumPurple, 5.0f);
         g->DrawEllipse(portalPen, x, y, width, height);
         delete portalPen;
@@ -87,7 +87,7 @@ public:
             delete particleBrush;
         }
 
-        // Texto "PORTAL"
+      
         System::Drawing::Font^ font = gcnew System::Drawing::Font("Arial", 12.0f, FontStyle::Bold);
         SolidBrush^ textBrush = gcnew SolidBrush(Color::White);
         g->DrawString("PORTAL", font, textBrush, (float)(x + 10), (float)(y + height + 5));

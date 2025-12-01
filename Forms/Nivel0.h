@@ -91,7 +91,7 @@ namespace JuegoFinal {
             bmpFondo = gcnew Bitmap("Assets/Background/fondo0.png");
 
             collisionMap = new CollisionMap();
-            collisionMap->cargarMapaNivel1();
+            collisionMap->cargarMapaNivel0();
 
             controller = new Controller(gameState->selectedHero, bmpHero1, bmpHero2);
             controller->setLevel(0); // IMPORTANTE: Nivel 0

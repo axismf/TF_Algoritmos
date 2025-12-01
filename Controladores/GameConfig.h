@@ -36,7 +36,7 @@ namespace JuegoFinal {
 
         // ============ FPS ============
         static const int TARGET_FPS = 60;
-        static const int TIMER_INTERVAL = 16;  // ~16ms para 60fps
+        static const int TIMER_INTERVAL = 16;  
     };
 
-} // namespace JuegoFinal
+} 

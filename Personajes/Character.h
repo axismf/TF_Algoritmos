@@ -10,14 +10,14 @@ protected:
 	int idx, idy;
 	double zoom = 1.0;
 
-	// --- LÍMITES DE MOVIMIENTO ---
+	
 	int minX, maxX;
 	int minY, maxY;
 
 public:
 	Character(int width, int height) : width(width), height(height) {
 		idx = idy = 0;
-		// Por defecto, límites muy grandes para no restringir si no se configuran
+		
 		minX = 0; maxX = 5000;
 		minY = 0; maxY = 5000;
 	}
@@ -29,9 +29,9 @@ public:
 		g->DrawImage(bmp, zoomRect, sectionShow, GraphicsUnit::Pixel);
 	}
 
-	virtual void move(Graphics^ g) {} // Método base
+	virtual void move(Graphics^ g) {} 
 
-	// --- CONFIGURAR ZONA DE MOVIMIENTO ---
+	
 	void setBounds(int x1, int y1, int ancho, int alto) {
 		minX = x1;
 		minY = y1;
@@ -54,6 +54,5 @@ public:
 	void changeDx() { dx *= -1; }
 	void changeDy() { dy *= -1; }
 
-	// Getters para que las clases hijas vean los límites (si fuera private)
-	// Como son protected, las clases hijas acceden directo a minX, maxX, etc.
+	
 };

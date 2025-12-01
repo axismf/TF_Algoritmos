@@ -72,7 +72,7 @@ namespace JuegoFinal {
             lblHero1Nombre->Location = Point(60, 45);
             panelHero1->Controls->Add(lblHero1Nombre);
 
-            // Imagen placeholder Hero1
+            
             PictureBox^ imgHero1 = gcnew PictureBox();
             imgHero1->Location = Point(40, 80);
             imgHero1->Size = Drawing::Size(150, 100);
@@ -101,7 +101,7 @@ namespace JuegoFinal {
             btnHero1->Click += gcnew EventHandler(this, &SelectCharacterForm::btnHero1_Click);
             panelHero1->Controls->Add(btnHero1);
 
-            // ============ PANEL HERO 2 ============
+          
             panelHero2 = gcnew Panel();
             panelHero2->Location = Point(335, 120);
             panelHero2->Size = Drawing::Size(230, 320);
@@ -125,7 +125,7 @@ namespace JuegoFinal {
             lblHero2Nombre->Location = Point(70, 45);
             panelHero2->Controls->Add(lblHero2Nombre);
 
-            // Imagen placeholder Hero2
+            
             PictureBox^ imgHero2 = gcnew PictureBox();
             imgHero2->Location = Point(40, 80);
             imgHero2->Size = Drawing::Size(150, 100);
@@ -154,7 +154,7 @@ namespace JuegoFinal {
             btnHero2->Click += gcnew EventHandler(this, &SelectCharacterForm::btnHero2_Click);
             panelHero2->Controls->Add(btnHero2);
 
-            // ============ PANEL IA ============
+           
             panelIA = gcnew Panel();
             panelIA->Location = Point(620, 120);
             panelIA->Size = Drawing::Size(230, 320);
@@ -178,7 +178,6 @@ namespace JuegoFinal {
             lblIANombre->Location = Point(60, 45);
             panelIA->Controls->Add(lblIANombre);
 
-            // Imagen placeholder IA
             PictureBox^ imgIA = gcnew PictureBox();
             imgIA->Location = Point(40, 80);
             imgIA->Size = Drawing::Size(150, 100);
@@ -207,7 +206,7 @@ namespace JuegoFinal {
             btnIA->Click += gcnew EventHandler(this, &SelectCharacterForm::btnIA_Click);
             panelIA->Controls->Add(btnIA);
 
-            // Botón Volver
+            
             btnVolver = gcnew Button();
             btnVolver->Text = L"⬅ VOLVER";
             btnVolver->Location = Point(360, 480);
@@ -232,7 +231,6 @@ namespace JuegoFinal {
             btnIA->MouseLeave += gcnew EventHandler(this, &SelectCharacterForm::btn_MouseLeave);
         }
 
-        // ============ EVENT HANDLERS ============
 
         void btnHero1_Click(Object^ sender, EventArgs^ e) {
             GameStateManager^ gameState = GameStateManager::getInstance();
@@ -266,7 +264,7 @@ namespace JuegoFinal {
             this->Close();
         }
 
-        // ============ EFECTOS HOVER ============
+      
 
         void btn_MouseEnter(Object^ sender, EventArgs^ e) {
             Button^ btn = safe_cast<Button^>(sender);
@@ -300,7 +298,7 @@ namespace JuegoFinal {
             pantallaDerrota->FormBorderStyle = System::Windows::Forms::FormBorderStyle::None;
             pantallaDerrota->BackColor = Color::Black;
 
-            // Animación de derrota
+           
             Label^ lblDerrota = gcnew Label();
             lblDerrota->Text = L"⚠️ DERROTA INEVITABLE ⚠️";
             lblDerrota->Font = gcnew Drawing::Font("Arial", 28.0f, FontStyle::Bold);
@@ -341,7 +339,7 @@ namespace JuegoFinal {
             lblEstadisticas->Location = Point(140, 230);
             pantallaDerrota->Controls->Add(lblEstadisticas);
 
-            // Botón aceptar derrota
+           
             Button^ btnAceptar = gcnew Button();
             btnAceptar->Text = L"ACEPTAR DERROTA";
             btnAceptar->Location = Point(200, 340);

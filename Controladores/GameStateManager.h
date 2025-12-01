@@ -18,14 +18,13 @@ namespace JuegoFinal {
         }
 
     public:
-        // Estado del juego
-        int selectedHero;       // 1 = Hero1, 2 = Hero2, 3 = IA
-        int currentLevel;       // Nivel actual (0 = habitación, 1-3 = niveles)
-        int score;              // Puntuación total
-        int totalEnemiesKilled; // Enemigos eliminados
-        bool gameStarted;       // Si el juego ha iniciado
-
-        // Singleton pattern
+        
+        int selectedHero;       
+        int currentLevel;      
+        int score;              
+        int totalEnemiesKilled; 
+        bool gameStarted;      
+        
         static GameStateManager^ getInstance() {
             if (instance == nullptr) {
                 instance = gcnew GameStateManager();
@@ -33,7 +32,7 @@ namespace JuegoFinal {
             return instance;
         }
 
-        // Reiniciar estado del juego
+        
         void resetGame() {
             currentLevel = 1;
             score = 0;
@@ -41,22 +40,22 @@ namespace JuegoFinal {
             gameStarted = true;
         }
 
-        // Avanzar al siguiente nivel
+        
         void nextLevel() {
             currentLevel++;
         }
 
-        // Agregar puntos
+       
         void addScore(int points) {
             score += points;
         }
 
-        // Agregar enemigo eliminado
+      
         void addEnemyKilled() {
             totalEnemiesKilled++;
         }
 
-        // Obtener información del héroe seleccionado
+        
         System::String^ getHeroName() {
             switch (selectedHero) {
             case 1: return "VELOCISTA";

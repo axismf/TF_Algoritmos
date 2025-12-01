@@ -14,7 +14,7 @@ namespace JuegoFinal {
         Button^ btnJugar;
         Button^ btnAyuda;
         Button^ btnSalir;
-
+        PictureBox^ fondoMenu;
     public:
         MenuPrincipal(void)
         {
@@ -22,6 +22,7 @@ namespace JuegoFinal {
         }
 
     private:
+        
         void InitializeComponent()
         {
             this->Text = L"Menu Principal - Juego 2D";
@@ -29,18 +30,26 @@ namespace JuegoFinal {
             this->StartPosition = FormStartPosition::CenterScreen;
             this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
             this->MaximizeBox = false;
-            this->BackColor = Color::FromArgb(20, 20, 30);
 
-            // Título del juego
+            
+            fondoMenu = gcnew PictureBox();
+            fondoMenu->Image = Image::FromFile("Assets/Background/menu.png");  
+            fondoMenu->SizeMode = PictureBoxSizeMode::StretchImage;
+            fondoMenu->Location = Point(0, 0);
+            fondoMenu->Size = Drawing::Size(800, 600);
+            this->Controls->Add(fondoMenu);
+
+            
             lblTitulo = gcnew Label();
-            lblTitulo->Text = L"AVENTURA 2D";
+            lblTitulo->Text = L"Redefiniendo el futuro";
             lblTitulo->Font = gcnew Drawing::Font("Arial", 36.0f, FontStyle::Bold);
             lblTitulo->ForeColor = Color::White;
+            lblTitulo->BackColor = Color::Transparent;  
             lblTitulo->AutoSize = true;
-            lblTitulo->Location = Point(220, 100);
-            this->Controls->Add(lblTitulo);
+            lblTitulo->Location = Point(190, 100);
+            fondoMenu->Controls->Add(lblTitulo);  
 
-            // Botón JUGAR
+            
             btnJugar = gcnew Button();
             btnJugar->Text = L"JUGAR";
             btnJugar->Location = Point(300, 250);
@@ -52,9 +61,9 @@ namespace JuegoFinal {
             btnJugar->FlatAppearance->BorderSize = 0;
             btnJugar->Cursor = Cursors::Hand;
             btnJugar->Click += gcnew EventHandler(this, &MenuPrincipal::btnJugar_Click);
-            this->Controls->Add(btnJugar);
+            fondoMenu->Controls->Add(btnJugar);  
 
-            // Botón AYUDA
+        
             btnAyuda = gcnew Button();
             btnAyuda->Text = L"AYUDA";
             btnAyuda->Location = Point(300, 320);
@@ -66,9 +75,9 @@ namespace JuegoFinal {
             btnAyuda->FlatAppearance->BorderSize = 0;
             btnAyuda->Cursor = Cursors::Hand;
             btnAyuda->Click += gcnew EventHandler(this, &MenuPrincipal::btnAyuda_Click);
-            this->Controls->Add(btnAyuda);
+            fondoMenu->Controls->Add(btnAyuda); 
 
-            // Botón SALIR
+           
             btnSalir = gcnew Button();
             btnSalir->Text = L"SALIR";
             btnSalir->Location = Point(300, 390);
@@ -80,20 +89,18 @@ namespace JuegoFinal {
             btnSalir->FlatAppearance->BorderSize = 0;
             btnSalir->Cursor = Cursors::Hand;
             btnSalir->Click += gcnew EventHandler(this, &MenuPrincipal::btnSalir_Click);
-            this->Controls->Add(btnSalir);
+            fondoMenu->Controls->Add(btnSalir);  
 
-            // Efectos hover para botones
+           
             btnJugar->MouseEnter += gcnew EventHandler(this, &MenuPrincipal::btnJugar_MouseEnter);
             btnJugar->MouseLeave += gcnew EventHandler(this, &MenuPrincipal::btnJugar_MouseLeave);
-
             btnAyuda->MouseEnter += gcnew EventHandler(this, &MenuPrincipal::btnAyuda_MouseEnter);
             btnAyuda->MouseLeave += gcnew EventHandler(this, &MenuPrincipal::btnAyuda_MouseLeave);
-
             btnSalir->MouseEnter += gcnew EventHandler(this, &MenuPrincipal::btnSalir_MouseEnter);
             btnSalir->MouseLeave += gcnew EventHandler(this, &MenuPrincipal::btnSalir_MouseLeave);
         }
 
-        // ============ EVENT HANDLERS ============
+      
 
         void btnJugar_Click(Object^ sender, EventArgs^ e) {
             SelectCharacterForm^ selectForm = gcnew SelectCharacterForm();
@@ -108,7 +115,7 @@ namespace JuegoFinal {
             Application::Exit();
         }
 
-        // ============ EFECTOS HOVER ============
+        
 
         void btnJugar_MouseEnter(Object^ sender, EventArgs^ e) {
             btnJugar->BackColor = Color::FromArgb(0, 150, 255);
@@ -146,14 +153,14 @@ namespace JuegoFinal {
             ventanaAyuda->MinimizeBox = false;
             ventanaAyuda->BackColor = Color::White;
 
-            // Panel de contenido
+           
             Panel^ panelContenido = gcnew Panel();
             panelContenido->Location = Point(20, 20);
             panelContenido->Size = Drawing::Size(540, 380);
             panelContenido->AutoScroll = true;
             ventanaAyuda->Controls->Add(panelContenido);
 
-            // Título
+            
             Label^ lblTituloAyuda = gcnew Label();
             lblTituloAyuda->Text = L"📖 CÓMO JUGAR";
             lblTituloAyuda->Font = gcnew Drawing::Font("Arial", 18.0f, FontStyle::Bold);
@@ -162,7 +169,7 @@ namespace JuegoFinal {
             lblTituloAyuda->Location = Point(10, 10);
             panelContenido->Controls->Add(lblTituloAyuda);
 
-            // Historia del juego
+           
             Label^ lblHistoria = gcnew Label();
             lblHistoria->Text = L"🎮 HISTORIA";
             lblHistoria->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
@@ -199,7 +206,7 @@ namespace JuegoFinal {
             lblControlesTexto->Location = Point(10, 160);
             panelContenido->Controls->Add(lblControlesTexto);
 
-            // Personajes
+           
             Label^ lblPersonajes = gcnew Label();
             lblPersonajes->Text = L"👤 PERSONAJES";
             lblPersonajes->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
@@ -220,7 +227,7 @@ namespace JuegoFinal {
             lblPersonajesTexto->Location = Point(10, 280);
             panelContenido->Controls->Add(lblPersonajesTexto);
 
-            // Objetivo
+            
             Label^ lblObjetivo = gcnew Label();
             lblObjetivo->Text = L"🎯 OBJETIVO";
             lblObjetivo->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
@@ -239,7 +246,6 @@ namespace JuegoFinal {
             lblObjetivoTexto->Location = Point(10, 415);
             panelContenido->Controls->Add(lblObjetivoTexto);
 
-            // Botón cerrar
             Button^ btnCerrar = gcnew Button();
             btnCerrar->Text = L"CERRAR";
             btnCerrar->Location = Point(230, 415);
@@ -251,7 +257,7 @@ namespace JuegoFinal {
             btnCerrar->FlatAppearance->BorderSize = 0;
             btnCerrar->Cursor = Cursors::Hand;
             btnCerrar->Click += gcnew EventHandler(this, &MenuPrincipal::btnCerrarAyuda_Click);
-            btnCerrar->Tag = ventanaAyuda; // Guardamos referencia a la ventana
+            btnCerrar->Tag = ventanaAyuda; 
             ventanaAyuda->Controls->Add(btnCerrar);
 
             ventanaAyuda->ShowDialog();
