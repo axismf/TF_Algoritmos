@@ -8,6 +8,7 @@ private:
     int width, height;
     int animationFrame;
     bool isActive;
+    bool visible; // Nuevo atributo
 
 public:
     Portal(int xPos, int yPos) {
@@ -17,6 +18,7 @@ public:
         height = 100;
         animationFrame = 0;
         isActive = false;
+        visible = true; // Visible por defecto
     }
 
     ~Portal() {}
@@ -25,12 +27,18 @@ public:
         isActive = true;
     }
 
+    // Nuevo método para controlar visibilidad
+    void setVisible(bool v) {
+        visible = v;
+    }
+
     bool getIsActive() {
         return isActive;
     }
 
     void draw(Graphics^ g) {
-        if (!isActive) return;
+        // Si no está activo O no es visible, no dibujar
+        if (!isActive || !visible) return;
 
         // Animación del portal (efecto de rotación)
         animationFrame++;

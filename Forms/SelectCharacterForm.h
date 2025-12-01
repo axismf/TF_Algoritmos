@@ -85,7 +85,7 @@ namespace JuegoFinal {
             lblHero1Info->Font = gcnew Drawing::Font("Arial", 10.0f);
             lblHero1Info->ForeColor = Color::White;
             lblHero1Info->AutoSize = true;
-            lblHero1Info->Location = Point(15, 195);
+            lblHero1Info->Location = Point(15, 175);
             panelHero1->Controls->Add(lblHero1Info);
 
             btnHero1 = gcnew Button();
@@ -138,7 +138,7 @@ namespace JuegoFinal {
             lblHero2Info->Font = gcnew Drawing::Font("Arial", 10.0f);
             lblHero2Info->ForeColor = Color::White;
             lblHero2Info->AutoSize = true;
-            lblHero2Info->Location = Point(15, 195);
+            lblHero2Info->Location = Point(15, 175);
             panelHero2->Controls->Add(lblHero2Info);
 
             btnHero2 = gcnew Button();

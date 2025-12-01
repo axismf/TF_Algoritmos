@@ -42,6 +42,7 @@ namespace JuegoFinal {
         int frameCount;
         int requiredTime;
         bool portalSpawned;
+        bool storyShown; // Variable para controlar si ya se mostró la historia
         GameStateManager^ gameState;
 
     public:
@@ -72,7 +73,7 @@ namespace JuegoFinal {
             this->components = gcnew System::ComponentModel::Container();
             this->SuspendLayout();
 
-            this->Text = L"TUTORIAL - Aprende a Jugar";
+            this->Text = L"Nivel 1 - Aprende a Jugar";
             this->ClientSize = System::Drawing::Size(1200, 700);
             this->StartPosition = FormStartPosition::CenterScreen;
             this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
@@ -89,7 +90,7 @@ namespace JuegoFinal {
             this->Controls->Add(panelHUD);
 
             lbNivel = gcnew Label();
-            lbNivel->Text = L"TUTORIAL";
+            lbNivel->Text = L"Nivel 1";
             lbNivel->Font = gcnew Drawing::Font("Arial", 18.0f, FontStyle::Bold);
             lbNivel->ForeColor = Color::LimeGreen;
             lbNivel->AutoSize = true;
@@ -101,7 +102,7 @@ namespace JuegoFinal {
             lbVidas->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbVidas->ForeColor = Color::Red;
             lbVidas->AutoSize = true;
-            lbVidas->Location = Point(250, 28);
+            lbVidas->Location = Point(230, 28);
             panelHUD->Controls->Add(lbVidas);
 
             lbTiempo = gcnew Label();
@@ -109,7 +110,7 @@ namespace JuegoFinal {
             lbTiempo->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbTiempo->ForeColor = Color::Yellow;
             lbTiempo->AutoSize = true;
-            lbTiempo->Location = Point(480, 28);
+            lbTiempo->Location = Point(460, 28);
             panelHUD->Controls->Add(lbTiempo);
 
             lbPuntos = gcnew Label();
@@ -117,15 +118,15 @@ namespace JuegoFinal {
             lbPuntos->Font = gcnew Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             lbPuntos->ForeColor = Color::Gold;
             lbPuntos->AutoSize = true;
-            lbPuntos->Location = Point(750, 28);
+            lbPuntos->Location = Point(730, 28);
             panelHUD->Controls->Add(lbPuntos);
 
             lbObjetivo = gcnew Label();
-            lbObjetivo->Text = L"Practica moverte con WASD";
+            lbObjetivo->Text = L"¡Encuentra la SALIDA antes del tiempo!";
             lbObjetivo->Font = gcnew Drawing::Font("Arial", 12.0f, FontStyle::Bold);
             lbObjetivo->ForeColor = Color::LightGreen;
             lbObjetivo->AutoSize = true;
-            lbObjetivo->Location = Point(950, 30);
+            lbObjetivo->Location = Point(880, 28);
             panelHUD->Controls->Add(lbObjetivo);
 
             // Label para coordenadas del mouse
@@ -156,10 +157,11 @@ namespace JuegoFinal {
         void InitializeGame()
         {
             gameState = GameStateManager::getInstance();
-            timeRemaining = 30;
-            requiredTime = 0; // Sin requisito de tiempo
+            timeRemaining = 30; // 30 segundos para encontrar la salida
+            requiredTime = 0;
             frameCount = 0;
             portalSpawned = false;
+            storyShown = false; // Inicializamos la bandera de la historia
 
             g = panelJuego->CreateGraphics();
             space = BufferedGraphicsManager::Current;
@@ -184,38 +186,86 @@ namespace JuegoFinal {
 
             // Crear mapa de colisiones
             collisionMap = new CollisionMap();
-            collisionMap->cargarMapaTutorial();
+            collisionMap->cargarMapaNivel1();
 
             int selectedHero = gameState->selectedHero;
             controller = new Controller(selectedHero, bmpHero1, bmpHero2);
-            
+
             // Establecer spawn inicial del tutorial
             controller->setInitialSpawn(500, 400);
-            
-            // NO crear enemigos en el tutorial
-            // controller->createEnemies(bmpEnemy1, bmpEnemy1, bmpEnemy1);
 
             // Activar portal/puerta inmediatamente
             controller->spawnPortal(60, 290);
+
+            // HACER EL PORTAL INVISIBLE (Requiere el cambio anterior en Controller.h)
+            controller->setPortalVisible(false);
+
             portalSpawned = true;
-            lbObjetivo->Text = "Ve a la PUERTA para comenzar";
-            lbObjetivo->ForeColor = Color::LimeGreen;
 
             timer->Enabled = true;
         }
 
         void timer_Tick(Object^ sender, EventArgs^ e)
         {
+            // ==========================================
+            // HISTORIA AL INICIO DEL NIVEL
+            // ==========================================
+            if (!storyShown) {
+                timer->Enabled = false; // Pausar juego para leer
+
+                MessageBox::Show(
+                    L"Qué sueño tan raro...",
+                    L"Historia",
+                    MessageBoxButtons::OK,
+                    MessageBoxIcon::None
+                );
+
+                MessageBox::Show(
+                    L"Soñé que el mundo ahora estaba dominado por la IA...",
+                    L"Historia",
+                    MessageBoxButtons::OK,
+                    MessageBoxIcon::Information
+                );
+
+                MessageBox::Show(
+                    L"Voy a salir a dar un paseo.",
+                    L"Historia",
+                    MessageBoxButtons::OK,
+                    MessageBoxIcon::Information
+                );
+
+                storyShown = true; // Marcar como leída
+                timer->Enabled = true; // Reanudar juego
+                return; // Salir de este tick para no procesar lógica extra
+            }
+
             frameCount++;
 
             if (frameCount % 60 == 0 && timeRemaining > 0) {
                 timeRemaining--;
                 lbTiempo->Text = "Tiempo: " + timeRemaining.ToString() + "s";
-                
-                gameState->addScore(5);
-                lbPuntos->Text = "Puntos: " + gameState->score.ToString();
 
-                // No hay requisito de tiempo, el portal ya está abierto
+                // Efecto visual si queda poco tiempo
+                if (timeRemaining <= 10) {
+                    lbTiempo->ForeColor = Color::Red;
+                }
+            }
+
+            // ==========================================
+            // CONDICIÓN DE DERROTA POR TIEMPO
+            // ==========================================
+            if (timeRemaining <= 0) {
+                timer->Enabled = false;
+                MessageBox::Show(
+                    "¡SE ACABÓ EL TIEMPO!\n\n" +
+                    "No lograste encontrar la salida a tiempo.\n" +
+                    "Inténtalo de nuevo.",
+                    "GAME OVER",
+                    MessageBoxButtons::OK,
+                    MessageBoxIcon::Error
+                );
+                this->Close();
+                return;
             }
 
             controller->moveEverything(buffer->Graphics);
@@ -236,16 +286,13 @@ namespace JuegoFinal {
 
             buffer->Graphics->Clear(Color::Black);
             buffer->Graphics->DrawImage(bmpFondo, 0, 0, panelJuego->Width, panelJuego->Height);
-            
-            // Dibujar muros translúcidos (para debug y ajuste)
-            collisionMap->dibujarMuros(buffer->Graphics);
-            
+
             // Dibujar instrucciones en pantalla
             DibujarInstrucciones();
-            
+
             controller->drawEverything(buffer->Graphics, bmpHero1, bmpHero2,
                 bmpEnemy1, bmpEnemy2, bmpEnemy3);
-            
+
             buffer->Render(g);
 
             if (portalSpawned && controller->checkPortalCollision()) {
@@ -254,9 +301,8 @@ namespace JuegoFinal {
                 return;
             }
 
-            // No hay game over por tiempo en el tutorial
+            // Derrota por vidas (aunque no hay enemigos en tutorial por ahora)
             if (controller->getVidasHero() <= 0) {
-                // No debería pasar en el tutorial sin enemigos
                 timer->Enabled = false;
                 this->Close();
             }
@@ -266,46 +312,45 @@ namespace JuegoFinal {
         {
             System::Drawing::Font^ font = gcnew System::Drawing::Font("Arial", 16.0f, FontStyle::Bold);
             SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(200, 255, 255, 255));
-            
-            String^ texto = 
+
+            String^ texto =
                 "CONTROLES:\n\n" +
                 "W - Arriba\n" +
                 "A - Izquierda\n" +
                 "S - Abajo\n" +
-                "D - Derecha\n\n" +
-                "ESC - Pausar";
-            
+                "D - Derecha\n\n";
+
             buffer->Graphics->DrawString(texto, font, brush, 50.0f, 50.0f);
-            
+
             delete font;
             delete brush;
 
             // Dibujar objetivo
             System::Drawing::Font^ font2 = gcnew System::Drawing::Font("Arial", 14.0f, FontStyle::Bold);
             SolidBrush^ brush2 = gcnew SolidBrush(Color::Yellow);
-            
-            String^ objetivo = "OBJETIVO: Practica moverte durante 15 segundos";
-            buffer->Graphics->DrawString(objetivo, font2, brush2, 350.0f, 500.0f);
-            
+
+            String^ objetivo = "¡VE LA PUERTA ANARANJADA!";
+            buffer->Graphics->DrawString(objetivo, font2, brush2, 350, 520);
+
             delete font2;
             delete brush2;
         }
 
         void MostrarPantallaTransicion() {
             gameState->addScore(100);
-            
+
             MessageBox::Show(
-                "TUTORIAL COMPLETADO!\n\n" +
-                "Ahora sabes como jugar.\n" +
+                "¡LO ENCONTRASTE!\n\n" +
+                "Nivel 1 completado.\n" +
                 "Puntuacion: " + gameState->score.ToString() + "\n\n" +
-                "Preparate para el NIVEL 1...",
-                "Listo para comenzar!", 
-                MessageBoxButtons::OK, 
+                "Preparate para el NIVEL 2...",
+                "¡Excelente!",
+                MessageBoxButtons::OK,
                 MessageBoxIcon::Information
             );
-            
+
             gameState->nextLevel();
-            
+
             this->Hide();
             Nivel1^ nivel1 = gcnew Nivel1();
             nivel1->ShowDialog();
@@ -337,9 +382,9 @@ namespace JuegoFinal {
             case Keys::Escape:
                 timer->Enabled = false;
                 if (MessageBox::Show(
-                    "Salir del tutorial?", 
+                    "Salir del juego?",
                     "Pausa",
-                    MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes) 
+                    MessageBoxButtons::YesNo) == System::Windows::Forms::DialogResult::Yes)
                 {
                     this->Close();
                 }
@@ -361,7 +406,7 @@ namespace JuegoFinal {
             // Límites de pantalla
             int anchoFrm = (int)buffer->Graphics->VisibleClipBounds.Width;
             int altoFrm = (int)buffer->Graphics->VisibleClipBounds.Height;
-            
+
             if (posX < 0) posX = 0;
             if (posY < 0) posY = 0;
             if (posX + ancho > anchoFrm)

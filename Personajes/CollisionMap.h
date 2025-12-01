@@ -43,19 +43,19 @@ public:
 
     void dibujarMuros(Graphics^ g) {
         // Brush translucido para ver las colisiones mientras ajustas
-        SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(100, 255, 0, 0)); // Rojo semi-transparente
-        Pen^ pen = gcnew Pen(Color::Red, 2.0f);
+    SolidBrush^ brush = gcnew SolidBrush(Color::FromArgb(100, 255, 0, 0)); // Rojo semi-transparente
+    Pen^ pen = gcnew Pen(Color::Red, 2.0f);
 
-        for (int i = 0; i < cantidadMuros; i++) {
-            g->FillRectangle(brush, murosX[i], murosY[i], murosAncho[i], murosAlto[i]);
-            g->DrawRectangle(pen, murosX[i], murosY[i], murosAncho[i], murosAlto[i]);
-        }
-
-        delete brush;
-        delete pen;
+    for (int i = 0; i < cantidadMuros; i++) {
+        g->FillRectangle(brush, murosX[i], murosY[i], murosAncho[i], murosAlto[i]);
+        g->DrawRectangle(pen, murosX[i], murosY[i], murosAncho[i], murosAlto[i]);
     }
 
-    void cargarMapaTutorial() {
+    delete brush;
+    delete pen;
+}
+
+    void cargarMapaNivel1() {
         cantidadMuros = 0;
 
         // PAREDES EXTERIORES (bordes del mapa)

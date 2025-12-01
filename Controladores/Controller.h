@@ -75,6 +75,13 @@ public:
 		spawnPortal(portalX, portalY);
 	}
 
+	// Nuevo método para cambiar la visibilidad del portal
+	void setPortalVisible(bool v) {
+		if (portal != nullptr) {
+			portal->setVisible(v);
+		}
+	}
+
 	bool isPortalSpawned() {
 		return portalSpawned;
 	}
